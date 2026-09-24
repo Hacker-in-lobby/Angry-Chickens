@@ -1,0 +1,6 @@
+{
+  "name": "Angry Chickens vs Sandeep",
+  "description": "Catapult angry chickens with realistic physics to destroy fortresses and defeat Sandeep across endless auto-generated levels with unique abilities and touch controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

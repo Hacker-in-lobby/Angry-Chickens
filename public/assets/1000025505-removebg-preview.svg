@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Pig Body Gradient -->
+    <radialGradient id="pigBodyGrad" cx="38%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#b4f043"/>
+      <stop offset="45%" stop-color="#7fc322"/>
+      <stop offset="85%" stop-color="#5a9612"/>
+      <stop offset="100%" stop-color="#3d6c08"/>
+    </radialGradient>
+
+    <!-- Ear Cavity Gradient -->
+    <radialGradient id="earInnerGrad" cx="40%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#558810"/>
+      <stop offset="100%" stop-color="#2d4c06"/>
+    </radialGradient>
+
+    <!-- Snout Gradient -->
+    <linearGradient id="snoutGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c6ff52"/>
+      <stop offset="50%" stop-color="#8cd522"/>
+      <stop offset="100%" stop-color="#5f9c10"/>
+    </linearGradient>
+
+    <!-- Hair Gradient -->
+    <linearGradient id="hairGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#33241c"/>
+      <stop offset="50%" stop-color="#1b120c"/>
+      <stop offset="100%" stop-color="#0a0604"/>
+    </linearGradient>
+
+    <!-- Beard Gradient -->
+    <linearGradient id="beardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2c1d14"/>
+      <stop offset="100%" stop-color="#120b07"/>
+    </linearGradient>
+
+    <!-- Specular Highlight -->
+    <linearGradient id="shineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <g id="sandeep-pig" filter="url(#shadow)">
+    <!-- BACK LIMBS / FEET -->
+    <ellipse cx="160" cy="460" rx="36" ry="24" fill="#4d7e0d" stroke="#254203" stroke-width="6"/>
+    <path d="M152 468 L152 482 M168 468 L168 482" stroke="#1d3002" stroke-width="4" stroke-linecap="round"/>
+
+    <ellipse cx="352" cy="460" rx="36" ry="24" fill="#4d7e0d" stroke="#254203" stroke-width="6"/>
+    <path d="M344 468 L344 482 M360 468 L360 482" stroke="#1d3002" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- PIG EARS -->
+    <!-- Left Ear -->
+    <g transform="rotate(-15 130 90)">
+      <ellipse cx="130" cy="90" rx="38" ry="46" fill="#7fc322" stroke="#284a04" stroke-width="8"/>
+      <ellipse cx="130" cy="94" rx="22" ry="28" fill="url(#earInnerGrad)"/>
+    </g>
+
+    <!-- Right Ear -->
+    <g transform="rotate(18 380 90)">
+      <ellipse cx="380" cy="90" rx="38" ry="46" fill="#7fc322" stroke="#284a04" stroke-width="8"/>
+      <ellipse cx="380" cy="94" rx="22" ry="28" fill="url(#earInnerGrad)"/>
+    </g>
+
+    <!-- MAIN PIG BODY -->
+    <circle cx="256" cy="270" r="195" fill="url(#pigBodyGrad)" stroke="#223e03" stroke-width="9"/>
+
+    <!-- BODY HIGHLIGHT SHINE -->
+    <path d="M 140 140 Q 256 95 350 140 Q 256 160 140 140 Z" fill="url(#shineGrad)"/>
+
+    <!-- SANDEEP STYLISH POMPADOUR HAIR -->
+    <!-- Back hair volume -->
+    <path d="M 120 180 C 100 110, 160 45, 250 40 C 340 35, 410 80, 395 180 C 370 120, 320 85, 250 85 C 180 85, 140 130, 120 180 Z" fill="#150e09" stroke="#050302" stroke-width="5"/>
+
+    <!-- Front stylized pompadour wave with slick hair lines -->
+    <path d="M 135 155 C 145 75, 230 40, 285 45 C 345 50, 390 95, 385 160 C 355 105, 305 80, 255 80 C 200 80, 155 115, 135 155 Z" fill="url(#hairGrad)"/>
+    
+    <!-- Hair strand highlights -->
+    <path d="M 170 120 Q 240 75 310 85" stroke="#4a3628" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 195 105 Q 260 65 330 80" stroke="#5d4433" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M 220 92 Q 275 60 345 80" stroke="#71543f" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+    <!-- EYEBROWS (Thick, confident, expressive) -->
+    <!-- Left Brow -->
+    <path d="M 135 195 Q 185 180 215 198 Q 185 190 135 195 Z" fill="#120c08" stroke="#080503" stroke-width="3"/>
+    <!-- Right Brow -->
+    <path d="M 295 198 Q 325 180 375 195 Q 325 190 295 198 Z" fill="#120c08" stroke="#080503" stroke-width="3"/>
+
+    <!-- EYES (Big cartoon expressive eyes) -->
+    <!-- Left Eye -->
+    <ellipse cx="178" cy="225" rx="34" ry="38" fill="#ffffff" stroke="#223e03" stroke-width="5"/>
+    <circle cx="188" cy="225" r="18" fill="#2d1b0d"/>
+    <circle cx="190" cy="225" r="10" fill="#000000"/>
+    <circle cx="184" cy="216" r="6" fill="#ffffff"/>
+    <circle cx="196" cy="231" r="3" fill="#ffffff"/>
+
+    <!-- Right Eye -->
+    <ellipse cx="332" cy="225" rx="34" ry="38" fill="#ffffff" stroke="#223e03" stroke-width="5"/>
+    <circle cx="322" cy="225" r="18" fill="#2d1b0d"/>
+    <circle cx="320" cy="225" r="10" fill="#000000"/>
+    <circle cx="314" cy="216" r="6" fill="#ffffff"/>
+    <circle cx="326" cy="231" r="3" fill="#ffffff"/>
+
+    <!-- ROSY CHEEKS -->
+    <ellipse cx="120" cy="285" rx="24" ry="16" fill="#ff4d4d" opacity="0.32"/>
+    <ellipse cx="392" cy="285" rx="24" ry="16" fill="#ff4d4d" opacity="0.32"/>
+
+    <!-- PIG SNOUT -->
+    <ellipse cx="256" cy="275" rx="58" ry="46" fill="url(#snoutGrad)" stroke="#223e03" stroke-width="6"/>
+    <!-- Nostrils -->
+    <ellipse cx="236" cy="275" rx="14" ry="18" fill="#254204" stroke="#172b02" stroke-width="3"/>
+    <ellipse cx="276" cy="275" rx="14" ry="18" fill="#254204" stroke="#172b02" stroke-width="3"/>
+    <!-- Snout Shine -->
+    <ellipse cx="244" cy="256" rx="18" ry="8" fill="#ffffff" opacity="0.45" transform="rotate(-10 244 256)"/>
+
+    <!-- SANDEEP STYLISH GROOMED BEARD & MUSTACHE -->
+    <!-- Mustache -->
+    <path d="M 195 320 Q 230 315 256 325 Q 282 315 317 320 Q 295 338 256 332 Q 217 338 195 320 Z" fill="url(#beardGrad)" stroke="#0d0805" stroke-width="3"/>
+
+    <!-- Big Confident White Teeth Smile -->
+    <path d="M 205 334 Q 256 375 307 334 Z" fill="#ffffff" stroke="#1d120a" stroke-width="4"/>
+    <path d="M 230 348 L 230 354 M 256 352 L 256 360 M 282 348 L 282 354" stroke="#d5d0c8" stroke-width="2"/>
+    <!-- Tongue hint -->
+    <path d="M 240 355 Q 256 350 272 355 Q 256 370 240 355 Z" fill="#e75858"/>
+
+    <!-- Groomed Chin Strap & Chin Beard -->
+    <path d="M 160 270 C 150 355, 195 435, 256 440 C 317 435, 362 355, 352 270 C 342 340, 310 405, 256 410 C 202 405, 170 340, 160 270 Z" fill="url(#beardGrad)" stroke="#090604" stroke-width="3"/>
+
+    <!-- Soul patch under lower lip -->
+    <path d="M 248 375 L 264 375 L 256 390 Z" fill="#140c08"/>
+
+    <!-- FRONT HOOVES / LITTLE PIG HANDS -->
+    <g transform="translate(130, 375) rotate(20)">
+      <ellipse cx="0" cy="0" rx="26" ry="18" fill="#69a818" stroke="#223e03" stroke-width="5"/>
+      <path d="M -6 6 L -6 16 M 6 6 L 6 16" stroke="#182c02" stroke-width="3"/>
+    </g>
+
+    <g transform="translate(382, 375) rotate(-20)">
+      <ellipse cx="0" cy="0" rx="26" ry="18" fill="#69a818" stroke="#223e03" stroke-width="5"/>
+      <path d="M -6 6 L -6 16 M 6 6 L 6 16" stroke="#182c02" stroke-width="3"/>
+    </g>
+  </g>
+</svg>
