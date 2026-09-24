@@ -16,13 +16,13 @@ export class CharacterRenderer {
   private static initImage() {
     if (typeof window === 'undefined' || CharacterRenderer.sandeepImg) return;
     CharacterRenderer.sandeepImg = new Image();
-    CharacterRenderer.sandeepImg.src = '/assets/1000025505-removebg-preview.png';
+    CharacterRenderer.sandeepImg.src = `${import.meta.env.BASE_URL}assets/1000025505-removebg-preview.png`;
     CharacterRenderer.sandeepImg.onload = () => {
       CharacterRenderer.imgLoaded = true;
     };
     CharacterRenderer.sandeepImg.onerror = () => {
       if (CharacterRenderer.sandeepImg && !CharacterRenderer.sandeepImg.src.includes('sandeep.svg')) {
-        CharacterRenderer.sandeepImg.src = '/assets/sandeep.svg';
+        CharacterRenderer.sandeepImg.src = `${import.meta.env.BASE_URL}assets/sandeep.svg`;
       } else {
         CharacterRenderer.imgLoaded = false;
       }

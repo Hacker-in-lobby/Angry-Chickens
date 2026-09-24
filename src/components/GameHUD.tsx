@@ -79,7 +79,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               alt="Sandeep"
               className="w-6 h-6 object-contain"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/assets/sandeep.svg';
+                (e.target as HTMLImageElement).src = `${import.meta.env.BASE_URL}assets/sandeep.svg`;
               }}
             />
             <span className="text-sm sm:text-base font-['Luckiest_Guy',cursive]">

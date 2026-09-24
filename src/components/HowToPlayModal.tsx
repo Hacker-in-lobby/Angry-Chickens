@@ -98,7 +98,7 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
                 alt="Sandeep"
                 className="w-14 h-14 object-contain shrink-0 drop-shadow"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/assets/sandeep.svg';
+                  (e.target as HTMLImageElement).src = `${import.meta.env.BASE_URL}assets/sandeep.svg`;
                 }}
               />
               <p className="text-xs sm:text-sm font-semibold text-stone-700">

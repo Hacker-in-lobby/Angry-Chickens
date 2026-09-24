@@ -35,7 +35,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
               alt="Sandeep surviving"
               className="w-28 h-28 object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)]"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/assets/sandeep.svg';
+                (e.target as HTMLImageElement).src = `${import.meta.env.BASE_URL}assets/sandeep.svg`;
               }}
             />
             <div className="absolute -top-1 -right-2 text-2xl">😏</div>

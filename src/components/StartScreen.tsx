@@ -89,7 +89,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({
                 className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)] animate-pulse"
                 onError={(e) => {
                   // Fallback to svg if png fails
-                  (e.target as HTMLImageElement).src = '/assets/sandeep.svg';
+                  (e.target as HTMLImageElement).src = `${import.meta.env.BASE_URL}assets/sandeep.svg`;
                 }}
               />
               <div className="absolute -bottom-2 bg-emerald-900 text-yellow-300 text-[10px] font-black px-2 py-0.5 rounded-full border border-yellow-400 shadow">
