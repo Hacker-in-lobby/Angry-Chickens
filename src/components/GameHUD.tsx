@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pause, RotateCcw, Volume2, VolumeX, Trophy } from 'lucide-react';
+import { Pause, RotateCcw, Volume2, VolumeX, Trophy, Eye, Compass } from 'lucide-react';
 import { LevelData } from '../types/game';
 
 interface GameHUDProps {
@@ -14,6 +14,8 @@ interface GameHUDProps {
   onPause: () => void;
   onRestart: () => void;
   onToggleSound: () => void;
+  onToggleCameraPan?: () => void;
+  isCameraAtFortress?: boolean;
 }
 
 export const GameHUD: React.FC<GameHUDProps> = ({
@@ -28,6 +30,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   onPause,
   onRestart,
   onToggleSound,
+  onToggleCameraPan,
+  isCameraAtFortress,
 }) => {
   return (
     <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-3 sm:p-4 select-none">
@@ -50,6 +54,23 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           >
             <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
           </button>
+
+          {onToggleCameraPan && (
+            <button
+              onClick={onToggleCameraPan}
+              className={`p-2.5 sm:p-3 text-white rounded-2xl border-3 shadow-[0_4px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none transition-all cursor-pointer flex items-center gap-1.5 ${
+                isCameraAtFortress
+                  ? 'bg-purple-600 hover:bg-purple-700 border-purple-900'
+                  : 'bg-emerald-600 hover:bg-emerald-700 border-emerald-900'
+              }`}
+              title={isCameraAtFortress ? 'Pan back to Slingshot' : 'Scroll to Fortress'}
+            >
+              <Eye className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="hidden md:inline text-xs font-black font-['Luckiest_Guy',cursive]">
+                {isCameraAtFortress ? 'SLING' : 'FORTRESS'}
+              </span>
+            </button>
+          )}
 
           <button
             onClick={onToggleSound}
@@ -101,8 +122,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
       {/* Bottom Hint */}
       <div className="w-full flex items-end justify-between pointer-events-none">
-        <div className="bg-black/35 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-white/10 text-white text-[11px] sm:text-xs font-semibold shadow">
-          🏹 Drag slingshot & release • Tap in flight for abilities!
+        <div className="bg-black/45 backdrop-blur-xs px-3.5 py-1.5 rounded-xl border border-white/10 text-white text-[11px] sm:text-xs font-semibold shadow">
+          🏹 Drag slingshot • ↔️ Swipe landscape to scroll • Tap in flight for abilities!
         </div>
 
         {highScore > 0 && (

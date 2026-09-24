@@ -296,7 +296,8 @@ export class LevelGenerator {
   }
 
   // Infinite Procedural Level Generator for Level 11, 12, ... 10,000+!
-  // Guaranteed rock-solid physics stability: no collapsing on spawn!
+  // Engineered with architectural stability: sturdy footers, independent bay lintels,
+  // and modular multi-tower designs so a single attack never causes a domino collapse.
   public static generateProceduralLevel(levelNum: number): LevelData {
     const gy = this.GROUND_Y;
     const fx = this.FORTRESS_START_X;
@@ -310,166 +311,396 @@ export class LevelGenerator {
 
     const blocks: BlockConfig[] = [];
     const pigs: SandeepConfig[] = [];
-
-    // Scale tier count with level (2 to 3 tiers)
-    const tierCount = Math.min(3, 2 + Math.floor((levelNum - 10) / 10));
-    // Number of bays/rooms: 2 or 3
-    const bays = 2 + (levelNum % 2);
-    const pillarsCount = bays + 1; // 3 or 4 pillars
-    const materials: ('wood' | 'ice' | 'stone')[] = ['wood', 'ice', 'stone'];
-
-    // Tower spacing: 150-175px (generous room for 2x size pigs)
-    const baySpacing = 150 + Math.floor(rnd() * 25);
-    const colWidth = 28;
-    const beamHeight = 22;
-
-    let currentFloorY = gy;
     let blockIdCounter = 1;
     let pigIdCounter = 1;
 
-    for (let tier = 0; tier < tierCount; tier++) {
-      // Column height: 115-135px (ample headspace above 2x pigs)
-      const colHeight = 115 + Math.floor(rnd() * 20);
-      const tierMat = materials[Math.floor(rnd() * materials.length)];
-      const colY = currentFloorY - colHeight / 2;
+    // 4 Distinct Architectural Archetypes
+    const archetype = levelNum % 4;
 
-      // Vertical columns
+    if (archetype === 0) {
+      // ARCHETYPE 0: Twin Fortresses (Two separate towers with gap in between)
+      // Destroying Tower 1 NEVER destroys Tower 2!
+      const towerWidth = 150;
+      const towerGap = 90;
+      const colWidth = 34;
+      const beamHeight = 26;
+
+      for (let t = 0; t < 2; t++) {
+        const tfx = fx + t * (towerWidth + towerGap);
+        const mat = t === 0 ? 'wood' : 'stone';
+        const colHeight = 120;
+
+        // Ground stone footers
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: tfx,
+          y: gy - 18,
+          width: 44,
+          height: 36,
+          material: 'stone',
+        });
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: tfx + towerWidth,
+          y: gy - 18,
+          width: 44,
+          height: 36,
+          material: 'stone',
+        });
+
+        // Vertical columns resting on footers
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: tfx,
+          y: gy - 36 - colHeight / 2,
+          width: colWidth,
+          height: colHeight,
+          material: mat,
+        });
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: tfx + towerWidth,
+          y: gy - 36 - colHeight / 2,
+          width: colWidth,
+          height: colHeight,
+          material: mat,
+        });
+
+        // Independent Lintel Beam for this tower
+        const lintelY = gy - 36 - colHeight - beamHeight / 2;
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: tfx + towerWidth / 2,
+          y: lintelY,
+          width: towerWidth + colWidth + 16,
+          height: beamHeight,
+          material: mat,
+        });
+
+        // Tower pig inside ground room
+        const pigType = t === 0 ? 'standard' : rnd() > 0.5 ? 'helmet' : 'standard';
+        const radius = pigType === 'helmet' ? 52 : 48;
+        const hp = pigType === 'helmet' ? 120 : 75;
+        pigs.push({
+          id: `pp_${pigIdCounter++}`,
+          x: tfx + towerWidth / 2,
+          y: gy - radius,
+          type: pigType,
+          radius,
+          health: hp,
+          maxHealth: hp,
+        });
+
+        // Second floor on top of Tower 2 or occasionally Tower 1
+        if (t === 1 || rnd() > 0.5) {
+          const topColHeight = 90;
+          const topColWidth = 28;
+          const topFloorY = lintelY - beamHeight / 2;
+
+          blocks.push({
+            id: `pb_${blockIdCounter++}`,
+            x: tfx + 20,
+            y: topFloorY - topColHeight / 2,
+            width: topColWidth,
+            height: topColHeight,
+            material: 'wood',
+          });
+          blocks.push({
+            id: `pb_${blockIdCounter++}`,
+            x: tfx + towerWidth - 20,
+            y: topFloorY - topColHeight / 2,
+            width: topColWidth,
+            height: topColHeight,
+            material: 'wood',
+          });
+          blocks.push({
+            id: `pb_${blockIdCounter++}`,
+            x: tfx + towerWidth / 2,
+            y: topFloorY - topColHeight - 12,
+            width: towerWidth - 10,
+            height: 22,
+            material: 'wood',
+          });
+
+          // Top balcony pig
+          pigs.push({
+            id: `pp_${pigIdCounter++}`,
+            x: tfx + towerWidth / 2,
+            y: topFloorY - 38,
+            type: 'small',
+            radius: 38,
+            health: 50,
+            maxHealth: 50,
+          });
+        }
+      }
+    } else if (archetype === 1) {
+      // ARCHETYPE 1: Step Pyramid Bastion (Wide, inherently stable ground floor with independent bay beams)
+      const baySpacing = 160;
+      const colWidth = 36;
+      const beamHeight = 24;
+      const colHeight = 120;
+
+      // 3 Ground Bays (4 pillars)
+      const pillarsCount = 4;
+
+      // 1. Stone footers for each pillar
       for (let c = 0; c < pillarsCount; c++) {
         const colX = fx + c * baySpacing;
         blocks.push({
           id: `pb_${blockIdCounter++}`,
           x: colX,
-          y: colY,
-          width: colWidth,
-          height: colHeight,
-          material: tierMat,
+          y: gy - 18,
+          width: 46,
+          height: 36,
+          material: 'stone',
         });
       }
 
-      // Horizontal continuous slab resting FLUSH on top of columns
-      const totalSpan = (pillarsCount - 1) * baySpacing + colWidth + 30;
-      const slabX = fx + ((pillarsCount - 1) * baySpacing) / 2;
-      const slabY = currentFloorY - colHeight - beamHeight / 2;
-      const beamMat = materials[Math.floor(rnd() * materials.length)];
+      // 2. Pillars standing on footers
+      for (let c = 0; c < pillarsCount; c++) {
+        const colX = fx + c * baySpacing;
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: colX,
+          y: gy - 36 - colHeight / 2,
+          width: colWidth,
+          height: colHeight,
+          material: c === 0 || c === 3 ? 'stone' : 'wood',
+        });
+      }
 
-      blocks.push({
-        id: `pb_${blockIdCounter++}`,
-        x: slabX,
-        y: slabY,
-        width: totalSpan,
-        height: beamHeight,
-        material: beamMat,
-      });
+      // 3. INDEPENDENT lintels per bay (Each bay has its own beam, so destroying one bay leaves others intact!)
+      const ceilingY = gy - 36 - colHeight - beamHeight / 2;
+      for (let b = 0; b < 3; b++) {
+        const bayCenterX = fx + b * baySpacing + baySpacing / 2;
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: bayCenterX,
+          y: ceilingY,
+          width: baySpacing + colWidth - 4,
+          height: beamHeight,
+          material: 'wood',
+        });
 
-      // Place pigs & occasional TNT safely inside the rooms of this tier
-      for (let b = 0; b < bays; b++) {
-        const roomCenterX = fx + b * baySpacing + baySpacing / 2;
-
-        // Occasional TNT crate on floor beside pig (tier 0 or 1)
-        if (tier === 0 && b === 0 && rnd() > 0.6) {
-          blocks.push({
-            id: `pb_${blockIdCounter++}`,
-            x: roomCenterX + 45,
-            y: currentFloorY - 24,
-            width: 46,
-            height: 46,
-            material: 'tnt',
-          });
-        }
-
-        // Determine if pig spawns in this chamber
-        if (rnd() > 0.25 || tier === 0 || pigs.length === 0) {
-          const isBoss = tier === tierCount - 1 && b === Math.floor(bays / 2) && levelNum % 5 === 0;
-          const pigType = isBoss
-            ? 'king'
-            : rnd() > 0.65
-            ? 'helmet'
-            : rnd() > 0.3
-            ? 'standard'
-            : 'small';
-
-          // 2x pig sizes!
-          const radius = pigType === 'king' ? 66 : pigType === 'helmet' ? 52 : pigType === 'small' ? 38 : 48;
-          const hp = pigType === 'king' ? 240 : pigType === 'helmet' ? 120 : pigType === 'small' ? 50 : 75;
-
+        // Pigs in room 0 and room 2
+        if (b === 0 || b === 2) {
+          const pType = b === 0 ? 'standard' : 'helmet';
+          const r = pType === 'helmet' ? 52 : 48;
           pigs.push({
             id: `pp_${pigIdCounter++}`,
-            x: roomCenterX,
-            y: currentFloorY - radius,
-            type: pigType,
-            radius,
-            health: hp,
-            maxHealth: hp,
+            x: bayCenterX,
+            y: gy - r,
+            type: pType,
+            radius: r,
+            health: pType === 'helmet' ? 120 : 75,
+            maxHealth: pType === 'helmet' ? 120 : 75,
           });
         }
       }
 
-      // Floor for next tier sits directly on top of this beam
-      currentFloorY = slabY - beamHeight / 2;
-    }
+      // 4. Center Upper Room (Floor 2)
+      const f2FloorY = ceilingY - beamHeight / 2;
+      const f2ColHeight = 95;
+      const f2LeftX = fx + baySpacing;
+      const f2RightX = fx + 2 * baySpacing;
 
-    // Ensure at least 2 pigs exist
-    if (pigs.length < 2) {
+      blocks.push({
+        id: `pb_${blockIdCounter++}`,
+        x: f2LeftX,
+        y: f2FloorY - f2ColHeight / 2,
+        width: 30,
+        height: f2ColHeight,
+        material: 'wood',
+      });
+      blocks.push({
+        id: `pb_${blockIdCounter++}`,
+        x: f2RightX,
+        y: f2FloorY - f2ColHeight / 2,
+        width: 30,
+        height: f2ColHeight,
+        material: 'wood',
+      });
+      blocks.push({
+        id: `pb_${blockIdCounter++}`,
+        x: (f2LeftX + f2RightX) / 2,
+        y: f2FloorY - f2ColHeight - 12,
+        width: baySpacing + 26,
+        height: 22,
+        material: 'stone',
+      });
+
+      // Upper Boss Pig / King
+      const isBossLvl = levelNum % 5 === 0;
+      const topPigType = isBossLvl ? 'king' : 'helmet';
+      const topRadius = isBossLvl ? 66 : 52;
       pigs.push({
         id: `pp_${pigIdCounter++}`,
-        x: fx + baySpacing,
+        x: (f2LeftX + f2RightX) / 2,
+        y: f2FloorY - topRadius,
+        type: topPigType,
+        radius: topRadius,
+        health: isBossLvl ? 240 : 120,
+        maxHealth: isBossLvl ? 240 : 120,
+      });
+    } else if (archetype === 2) {
+      // ARCHETYPE 2: Reinforced Heavy Stone Bunker with Side Ice Shed
+      const bunkerWidth = 200;
+      const shedWidth = 140;
+      const colHeight = 125;
+
+      // Bunker Footers
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: fx, y: gy - 20, width: 48, height: 40, material: 'stone' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: fx + bunkerWidth, y: gy - 20, width: 48, height: 40, material: 'stone' });
+
+      // Bunker Stone Columns
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: fx, y: gy - 40 - colHeight / 2, width: 38, height: colHeight, material: 'stone' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: fx + bunkerWidth, y: gy - 40 - colHeight / 2, width: 38, height: colHeight, material: 'stone' });
+
+      // Bunker Thick Roof Slab
+      const bunkerRoofY = gy - 40 - colHeight - 14;
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: fx + bunkerWidth / 2, y: bunkerRoofY, width: bunkerWidth + 50, height: 28, material: 'stone' });
+
+      // Pig inside Stone Bunker
+      pigs.push({
+        id: `pp_${pigIdCounter++}`,
+        x: fx + bunkerWidth / 2,
+        y: gy - 52,
+        type: 'helmet',
+        radius: 52,
+        health: 120,
+        maxHealth: 120,
+      });
+
+      // Side Ice / Glass Greenhouse
+      const shedX = fx + bunkerWidth + 40;
+      const shedColHeight = 110;
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: shedX, y: gy - 16, width: 40, height: 32, material: 'stone' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: shedX + shedWidth, y: gy - 16, width: 40, height: 32, material: 'stone' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: shedX, y: gy - 32 - shedColHeight / 2, width: 26, height: shedColHeight, material: 'ice' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: shedX + shedWidth, y: gy - 32 - shedColHeight / 2, width: 26, height: shedColHeight, material: 'ice' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: shedX + shedWidth / 2, y: gy - 32 - shedColHeight - 11, width: shedWidth + 34, height: 22, material: 'ice' });
+
+      // Pig inside Ice Shed
+      pigs.push({
+        id: `pp_${pigIdCounter++}`,
+        x: shedX + shedWidth / 2,
         y: gy - 48,
         type: 'standard',
         radius: 48,
         health: 75,
         maxHealth: 75,
       });
-    }
 
-    // Stable Roof Ornament / Battlements on top
-    const topSlabX = fx + ((pillarsCount - 1) * baySpacing) / 2;
-    const topSlabWidth = (pillarsCount - 1) * baySpacing + colWidth + 30;
-
-    // Left and right battlements
-    blocks.push({
-      id: `pb_${blockIdCounter++}`,
-      x: topSlabX - topSlabWidth / 2 + 18,
-      y: currentFloorY - 15,
-      width: 28,
-      height: 30,
-      material: 'stone',
-    });
-    blocks.push({
-      id: `pb_${blockIdCounter++}`,
-      x: topSlabX + topSlabWidth / 2 - 18,
-      y: currentFloorY - 15,
-      width: 28,
-      height: 30,
-      material: 'stone',
-    });
-
-    // Optional center boulder or decorative pediment
-    if (rnd() > 0.5) {
-      blocks.push({
-        id: `pb_${blockIdCounter++}`,
-        x: topSlabX,
-        y: currentFloorY - 26,
-        width: 52,
-        height: 52,
-        material: 'stone',
-        isCircle: true,
+      // Top Roof Battlement & Small Pig
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: fx + 30, y: bunkerRoofY - 22, width: 30, height: 30, material: 'stone' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: fx + bunkerWidth - 30, y: bunkerRoofY - 22, width: 30, height: 30, material: 'stone' });
+      pigs.push({
+        id: `pp_${pigIdCounter++}`,
+        x: fx + bunkerWidth / 2,
+        y: bunkerRoofY - 38,
+        type: 'small',
+        radius: 38,
+        health: 50,
+        maxHealth: 50,
       });
-      // Side stoppers so the boulder doesn't roll until hit
-      blocks.push({
-        id: `pb_${blockIdCounter++}`,
-        x: topSlabX - 36,
-        y: currentFloorY - 14,
-        width: 18,
-        height: 24,
-        material: 'wood',
-      });
-      blocks.push({
-        id: `pb_${blockIdCounter++}`,
-        x: topSlabX + 36,
-        y: currentFloorY - 14,
-        width: 18,
-        height: 24,
-        material: 'wood',
+    } else {
+      // ARCHETYPE 3: Castle Gatehouse & Watchtowers
+      // Left Guard Post, Gate Archway, Right Keep
+      const baySpacing = 155;
+      const colWidth = 36;
+      const colHeight = 120;
+
+      // 3 Ground Rooms with separate lintels
+      for (let c = 0; c < 4; c++) {
+        const colX = fx + c * baySpacing;
+        // Foundation Footer
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: colX,
+          y: gy - 18,
+          width: 44,
+          height: 36,
+          material: 'stone',
+        });
+        // Column
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: colX,
+          y: gy - 36 - colHeight / 2,
+          width: colWidth,
+          height: colHeight,
+          material: c === 1 || c === 2 ? 'wood' : 'stone',
+        });
+      }
+
+      // 3 Independent Bay Lintels
+      const beamY = gy - 36 - colHeight - 13;
+      for (let b = 0; b < 3; b++) {
+        const bX = fx + b * baySpacing + baySpacing / 2;
+        blocks.push({
+          id: `pb_${blockIdCounter++}`,
+          x: bX,
+          y: beamY,
+          width: baySpacing + colWidth - 2,
+          height: 26,
+          material: b === 1 ? 'stone' : 'wood',
+        });
+
+        // Pigs in room 0 and room 1
+        if (b < 2) {
+          const isHelmet = b === 1;
+          const r = isHelmet ? 52 : 48;
+          pigs.push({
+            id: `pp_${pigIdCounter++}`,
+            x: bX,
+            y: gy - r,
+            type: isHelmet ? 'helmet' : 'standard',
+            radius: r,
+            health: isHelmet ? 120 : 75,
+            maxHealth: isHelmet ? 120 : 75,
+          });
+        } else {
+          // Room 2 has a TNT crate protected by thick stone
+          blocks.push({
+            id: `pb_${blockIdCounter++}`,
+            x: bX,
+            y: gy - 24,
+            width: 48,
+            height: 48,
+            material: 'tnt',
+          });
+          pigs.push({
+            id: `pp_${pigIdCounter++}`,
+            x: bX,
+            y: gy - 48 - 48,
+            type: 'standard',
+            radius: 46,
+            health: 70,
+            maxHealth: 70,
+          });
+        }
+      }
+
+      // Watchtower on Right Keep (b = 2)
+      const wtFloorY = beamY - 13;
+      const wtColHeight = 90;
+      const wtLeftX = fx + 2 * baySpacing + 15;
+      const wtRightX = fx + 3 * baySpacing - 15;
+
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: wtLeftX, y: wtFloorY - wtColHeight / 2, width: 28, height: wtColHeight, material: 'wood' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: wtRightX, y: wtFloorY - wtColHeight / 2, width: 28, height: wtColHeight, material: 'wood' });
+      blocks.push({ id: `pb_${blockIdCounter++}`, x: (wtLeftX + wtRightX) / 2, y: wtFloorY - wtColHeight - 11, width: baySpacing - 10, height: 22, material: 'wood' });
+
+      // Sentry pig on tower
+      pigs.push({
+        id: `pp_${pigIdCounter++}`,
+        x: (wtLeftX + wtRightX) / 2,
+        y: wtFloorY - 38,
+        type: 'small',
+        radius: 38,
+        health: 50,
+        maxHealth: 50,
       });
     }
 
@@ -486,10 +717,10 @@ export class LevelGenerator {
     }
 
     // Compute star score targets
-    const baseScore = blocks.length * 800 + pigs.length * 6000;
+    const baseScore = blocks.length * 600 + pigs.length * 5000;
     const oneStar = Math.floor(baseScore * 0.6);
-    const twoStar = Math.floor(baseScore * 1.05 + (chickens.length - 1) * 7500);
-    const threeStar = Math.floor(baseScore * 1.45 + (chickens.length - 1) * 10500);
+    const twoStar = Math.floor(baseScore * 0.95 + (chickens.length - 1) * 4500);
+    const threeStar = Math.floor(baseScore * 1.35 + (chickens.length - 1) * 7000);
 
     const levelTitles = [
       'The Sandeep Fortress',

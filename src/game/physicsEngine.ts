@@ -188,9 +188,11 @@ export class PhysicsGameEngine {
   private spawnBlock(config: BlockConfig) {
     let body: Matter.Body;
     const opts: Matter.IChamferableBodyDefinition = {
-      friction: config.material === 'ice' ? 0.05 : config.material === 'wood' ? 0.4 : 0.8,
-      restitution: config.material === 'ice' ? 0.2 : config.material === 'wood' ? 0.15 : 0.05,
-      density: config.material === 'stone' ? 0.004 : config.material === 'wood' ? 0.0018 : 0.0012,
+      // Sturdy friction so pillars don't slide or collapse from micro-vibrations
+      friction: config.material === 'ice' ? 0.15 : config.material === 'wood' ? 0.85 : 0.98,
+      frictionStatic: config.material === 'ice' ? 0.3 : config.material === 'wood' ? 0.95 : 1.2,
+      restitution: config.material === 'ice' ? 0.12 : 0.01,
+      density: config.material === 'stone' ? 0.006 : config.material === 'wood' ? 0.003 : 0.0018,
       label: `block_${config.material}_${config.id}`,
     };
 
@@ -204,7 +206,7 @@ export class PhysicsGameEngine {
       Matter.Body.setAngle(body, config.angle);
     }
 
-    const maxHp = config.material === 'stone' ? 220 : config.material === 'wood' ? 90 : config.material === 'ice' ? 45 : 35;
+    const maxHp = config.material === 'stone' ? 320 : config.material === 'wood' ? 160 : config.material === 'ice' ? 80 : 40;
 
     this.blockBodies.set(config.id, {
       body,
@@ -286,15 +288,16 @@ export class PhysicsGameEngine {
 
     const isChicken = attacker.label.startsWith('chicken_') || attacker.label.startsWith('matilda_egg');
 
-    // For non-chicken bodies (falling blocks/nudges), require substantial impact speed
-    if (!isChicken && relSpeed < 3.8) return;
+    // For non-chicken bodies (falling blocks/nudges), require high impact speed
+    if (!isChicken && relSpeed < 4.8) return;
+    if (isChicken && relSpeed < 1.4) return;
 
     for (const [id, pigData] of this.pigBodies.entries()) {
       if (pigData.body === target) {
         const massBonus = Math.min(3, attacker.mass);
         const damage = isChicken
-          ? Math.round(relSpeed * 10 * massBonus)
-          : Math.round((relSpeed - 2.0) * 8 * massBonus);
+          ? Math.round(relSpeed * 12 * massBonus)
+          : Math.round((relSpeed - 3.5) * 8 * massBonus);
 
         if (damage <= 0) return;
 
@@ -316,7 +319,10 @@ export class PhysicsGameEngine {
     if (this.isSettlingPhase) return;
 
     const isChicken = attacker.label.startsWith('chicken_') || attacker.label.startsWith('matilda_egg');
-    if (!isChicken && relSpeed < 2.5) return;
+    // Only substantial impacts damage blocks:
+    // Non-chicken collisions (tumbling blocks) require high speed (>= 6.0) to eliminate runaway domino collapses
+    if (!isChicken && relSpeed < 6.0) return;
+    if (isChicken && relSpeed < 1.4) return;
 
     for (const [id, blockData] of this.blockBodies.entries()) {
       if (blockData.body === target) {
@@ -332,7 +338,11 @@ export class PhysicsGameEngine {
           attackerBonus = 4.0;
         }
 
-        const damage = Math.round(relSpeed * 6.5 * attackerBonus);
+        const damage = isChicken
+          ? Math.round(relSpeed * 8.5 * attackerBonus)
+          : Math.round((relSpeed - 4.5) * 4.0);
+
+        if (damage <= 0) return;
         blockData.health -= damage;
 
         // Play impact sound & particles
@@ -353,9 +363,9 @@ export class PhysicsGameEngine {
 
   private destroyBlock(id: string, blockData: { body: Matter.Body; config: BlockConfig }) {
     const pos = blockData.body.position;
-    const pts = blockData.config.material === 'stone' ? 800 : blockData.config.material === 'wood' ? 500 : 350;
+    const pts = blockData.config.material === 'stone' ? 200 : blockData.config.material === 'wood' ? 120 : 80;
 
-    this.addScore(pts, pos.x, pos.y, pts > 500 ? '#fde047' : '#ffffff');
+    this.addScore(pts, pos.x, pos.y, pts > 150 ? '#fde047' : '#ffffff');
     this.spawnImpactParticles(pos.x, pos.y, '#d1d5db', 8);
 
     Matter.World.remove(this.world, blockData.body);
@@ -366,8 +376,8 @@ export class PhysicsGameEngine {
     const pos = pigData.body.position;
     soundManager.playSandeepPop();
 
-    // Floating +5000 score
-    const pts = 5000;
+    // Floating +3000 score
+    const pts = 3000;
     this.addScore(pts, pos.x, pos.y, '#4ade80');
 
     // Pop particles
@@ -396,7 +406,7 @@ export class PhysicsGameEngine {
       this.blockBodies.delete(tntId);
     }
 
-    this.addScore(1500, x, y, '#ef4444');
+    this.addScore(500, x, y, '#ef4444');
     this.spawnImpactParticles(x, y, '#ff5500', 25, 'spark');
     this.spawnImpactParticles(x, y, '#4b5563', 15, 'smoke');
 
@@ -471,10 +481,13 @@ export class PhysicsGameEngine {
       this.settlePhaseTimer = null;
     }
 
-    // Check if clicked/touched close to slingshot with a generous touch area for mobile landscape
-    const dist = Math.hypot(x - this.SLING_X, y - this.SLING_Y);
-    const inSlingZone = dist < 130 || (x >= 30 && x <= 330 && y >= 240 && y <= 560);
-    if (inSlingZone) {
+    // Convert screen coordinates to world coordinates considering camera transform!
+    const worldX = x / this.cameraZoom + this.cameraX;
+    const worldY = y / this.cameraZoom + this.cameraY;
+
+    // Check if clicked/touched close to slingshot in world space
+    const dist = Math.hypot(worldX - this.SLING_X, worldY - this.SLING_Y);
+    if (dist < 105) {
       this.isPulling = true;
       this.updatePull(x, y);
       return true;
@@ -485,8 +498,12 @@ export class PhysicsGameEngine {
   public updatePull(x: number, y: number) {
     if (!this.isPulling) return;
 
-    let dx = x - this.SLING_X;
-    let dy = y - this.SLING_Y;
+    // Convert screen coordinates to world coordinates
+    const worldX = x / this.cameraZoom + this.cameraX;
+    const worldY = y / this.cameraZoom + this.cameraY;
+
+    let dx = worldX - this.SLING_X;
+    let dy = worldY - this.SLING_Y;
     const dist = Math.hypot(dx, dy);
 
     // Limit to pulling backwards / within max radius
@@ -530,8 +547,28 @@ export class PhysicsGameEngine {
     this.launchTime = Date.now();
     this.lastFlightTrails = [];
 
-    const radius = this.currentChickenType === 'blues' ? 16 : this.currentChickenType === 'bomb' ? 26 : 22;
-    const density = this.currentChickenType === 'bomb' ? 0.0035 : 0.0022;
+    // Bigger, impactful bird sizes for prominent visibility
+    const radius =
+      this.currentChickenType === 'blues'
+        ? 34
+        : this.currentChickenType === 'bomb'
+        ? 54
+        : this.currentChickenType === 'matilda'
+        ? 48
+        : this.currentChickenType === 'chuck'
+        ? 44
+        : 46;
+
+    const density =
+      this.currentChickenType === 'bomb'
+        ? 0.0055
+        : this.currentChickenType === 'matilda'
+        ? 0.0035
+        : this.currentChickenType === 'red'
+        ? 0.0032
+        : this.currentChickenType === 'chuck'
+        ? 0.0028
+        : 0.0024;
 
     const chickenBody = Matter.Bodies.circle(this.pullPos.x, this.pullPos.y, radius, {
       friction: 0.4,
@@ -570,7 +607,7 @@ export class PhysicsGameEngine {
           x: vel.x * 2.3,
           y: vel.y * 1.4 - 2,
         });
-        this.spawnImpactParticles(pos.x, pos.y, '#f59e0b', 12, 'spark');
+        this.spawnImpactParticles(pos.x, pos.y, '#f59e0b', 14, 'spark');
         break;
       }
       case 'blues': {
@@ -581,9 +618,9 @@ export class PhysicsGameEngine {
 
         // Bird 2 (angled up 18 deg)
         const angleUp = curAngle - 0.28;
-        const b2 = Matter.Bodies.circle(pos.x, pos.y - 15, 14, {
+        const b2 = Matter.Bodies.circle(pos.x, pos.y - 24, 26, {
           friction: 0.3,
-          density: 0.002,
+          density: 0.0024,
           label: `chicken_blues_split_1`,
         });
         Matter.World.add(this.world, b2);
@@ -595,9 +632,9 @@ export class PhysicsGameEngine {
 
         // Bird 3 (angled down 18 deg)
         const angleDown = curAngle + 0.28;
-        const b3 = Matter.Bodies.circle(pos.x, pos.y + 15, 14, {
+        const b3 = Matter.Bodies.circle(pos.x, pos.y + 24, 26, {
           friction: 0.3,
-          density: 0.002,
+          density: 0.0024,
           label: `chicken_blues_split_2`,
         });
         Matter.World.add(this.world, b3);
@@ -607,7 +644,7 @@ export class PhysicsGameEngine {
         });
         this.extraChickenBodies.push(b3);
 
-        this.spawnImpactParticles(pos.x, pos.y, '#38bdf8', 10, 'feather');
+        this.spawnImpactParticles(pos.x, pos.y, '#38bdf8', 12, 'feather');
         break;
       }
       case 'bomb': {
@@ -625,16 +662,16 @@ export class PhysicsGameEngine {
         });
 
         // Egg projectile falling straight down
-        const egg = Matter.Bodies.circle(pos.x, pos.y + 15, 12, {
-          density: 0.005,
+        const egg = Matter.Bodies.circle(pos.x, pos.y + 24, 24, {
+          density: 0.008,
           friction: 0.8,
           label: `matilda_egg`,
         });
         Matter.World.add(this.world, egg);
-        Matter.Body.setVelocity(egg, { x: vel.x * 0.2, y: 15 });
+        Matter.Body.setVelocity(egg, { x: vel.x * 0.2, y: 16 });
         this.extraChickenBodies.push(egg);
 
-        this.spawnImpactParticles(pos.x, pos.y, '#ffffff', 8, 'smoke');
+        this.spawnImpactParticles(pos.x, pos.y, '#ffffff', 10, 'smoke');
         break;
       }
       case 'red':
@@ -786,9 +823,9 @@ export class PhysicsGameEngine {
   }
 
   private finishLevelVictory() {
-    // Bonus 10,000 points per unused chicken
+    // Bonus 5,000 points per unused chicken
     const unusedChickens = this.chickensQueue.length;
-    const bonus = unusedChickens * 10000;
+    const bonus = unusedChickens * 5000;
     this.currentScore += bonus;
     this.callbacks.onScoreUpdate(this.currentScore);
 
@@ -873,17 +910,40 @@ export class PhysicsGameEngine {
       // Smooth camera follow
       this.targetCameraX = Math.max(0, Math.min(pos.x - 380, 800));
       this.targetCameraZoom = pos.x > 500 ? 0.88 : 1.0;
-    } else {
-      // Pan back to slingshot or middle
-      if (!this.chickenInFlight) {
-        this.targetCameraX = 0;
-        this.targetCameraZoom = 1.0;
-      }
+    } else if (this.isPulling) {
+      // While pulling slingshot, always center back on slingshot
+      this.targetCameraX = 0;
+      this.targetCameraZoom = 1.0;
     }
 
     // Camera Lerp
     this.cameraX += (this.targetCameraX - this.cameraX) * 0.08;
     this.cameraZoom += (this.targetCameraZoom - this.cameraZoom) * 0.08;
+  }
+
+  // Manual Landscape Camera Panning & Scrolling
+  public panCamera(deltaX: number) {
+    if (this.chickenInFlight || this.isPulling) return;
+    this.targetCameraX = Math.max(0, Math.min(850, this.targetCameraX + deltaX));
+    this.cameraX = this.targetCameraX; // Direct 1:1 finger tracking for zero lag
+  }
+
+  public resetCameraToSling() {
+    this.targetCameraX = 0;
+    this.targetCameraZoom = 1.0;
+  }
+
+  public toggleCameraPan() {
+    if (this.chickenInFlight || this.isPulling) return;
+    if (this.targetCameraX > 250) {
+      this.targetCameraX = 0;
+    } else {
+      this.targetCameraX = 650;
+    }
+  }
+
+  public isCameraAtFortress(): boolean {
+    return this.targetCameraX > 250;
   }
 
   // Main Render Frame
@@ -1025,12 +1085,12 @@ export class PhysicsGameEngine {
   // Slingshot Back Band
   private drawSlingshotBack() {
     const ctx = this.ctx;
-    const forkLeftX = this.SLING_X - 18;
-    const forkY = this.SLING_Y - 32;
+    const forkLeftX = this.SLING_X - 22;
+    const forkY = this.SLING_Y - 36;
 
     if (this.isPulling) {
       ctx.strokeStyle = '#3e2723';
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 7;
       ctx.beginPath();
       ctx.moveTo(forkLeftX, forkY);
       ctx.lineTo(this.pullPos.x, this.pullPos.y);
@@ -1042,7 +1102,16 @@ export class PhysicsGameEngine {
   private drawSlingshotChicken() {
     if (!this.currentChickenType || this.chickenInFlight) return;
     const ctx = this.ctx;
-    const r = this.currentChickenType === 'blues' ? 16 : this.currentChickenType === 'bomb' ? 26 : 22;
+    const r =
+      this.currentChickenType === 'blues'
+        ? 34
+        : this.currentChickenType === 'bomb'
+        ? 54
+        : this.currentChickenType === 'matilda'
+        ? 48
+        : this.currentChickenType === 'chuck'
+        ? 44
+        : 46;
 
     const angle = this.isPulling ? Math.atan2(this.SLING_Y - this.pullPos.y, this.SLING_X - this.pullPos.x) : 0;
 
@@ -1052,7 +1121,7 @@ export class PhysicsGameEngine {
     if (this.isPulling) {
       ctx.fillStyle = '#4e342e';
       ctx.beginPath();
-      ctx.arc(this.pullPos.x - 8, this.pullPos.y, r * 0.9, Math.PI * 0.5, Math.PI * 1.5);
+      ctx.arc(this.pullPos.x - 10, this.pullPos.y, r * 1.02, Math.PI * 0.5, Math.PI * 1.5);
       ctx.fill();
     }
   }
@@ -1065,10 +1134,10 @@ export class PhysicsGameEngine {
 
     // Front rubber band
     if (this.isPulling) {
-      const forkRightX = sx + 18;
-      const forkY = sy - 32;
+      const forkRightX = sx + 22;
+      const forkY = sy - 36;
       ctx.strokeStyle = '#2d1810';
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 7;
       ctx.beginPath();
       ctx.moveTo(forkRightX, forkY);
       ctx.lineTo(this.pullPos.x, this.pullPos.y);
@@ -1082,15 +1151,15 @@ export class PhysicsGameEngine {
 
     // Main column
     ctx.beginPath();
-    ctx.roundRect(sx - 12, sy - 10, 24, 130, 6);
+    ctx.roundRect(sx - 14, sy - 10, 28, 135, 7);
     ctx.fill();
     ctx.stroke();
 
     // Left branch
     ctx.beginPath();
-    ctx.moveTo(sx - 10, sy);
-    ctx.lineTo(sx - 24, sy - 36);
-    ctx.lineTo(sx - 12, sy - 36);
+    ctx.moveTo(sx - 12, sy);
+    ctx.lineTo(sx - 28, sy - 40);
+    ctx.lineTo(sx - 14, sy - 40);
     ctx.lineTo(sx, sy - 5);
     ctx.closePath();
     ctx.fill();
@@ -1098,9 +1167,9 @@ export class PhysicsGameEngine {
 
     // Right branch
     ctx.beginPath();
-    ctx.moveTo(sx + 10, sy);
-    ctx.lineTo(sx + 24, sy - 36);
-    ctx.lineTo(sx + 12, sy - 36);
+    ctx.moveTo(sx + 12, sy);
+    ctx.lineTo(sx + 28, sy - 40);
+    ctx.lineTo(sx + 14, sy - 40);
     ctx.lineTo(sx, sy - 5);
     ctx.closePath();
     ctx.fill();
@@ -1110,20 +1179,20 @@ export class PhysicsGameEngine {
     ctx.strokeStyle = '#6d431c';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(sx - 4, sy + 15);
-    ctx.lineTo(sx + 4, sy + 70);
+    ctx.moveTo(sx - 5, sy + 15);
+    ctx.lineTo(sx + 5, sy + 70);
     ctx.stroke();
   }
 
   // Draw Remaining Chickens waiting in line on the ground
   private drawChickenQueue() {
     const ctx = this.ctx;
-    const startX = this.SLING_X - 45;
-    const groundY = 512;
+    const startX = this.SLING_X - 60;
+    const groundY = 516;
 
     this.chickensQueue.forEach((type, idx) => {
-      const qx = startX - idx * 24;
-      const r = type === 'blues' ? 12 : type === 'bomb' ? 17 : 14;
+      const qx = startX - idx * 58;
+      const r = type === 'blues' ? 26 : type === 'bomb' ? 40 : type === 'matilda' ? 36 : type === 'chuck' ? 32 : 34;
       CharacterRenderer.drawChicken(ctx, type, qx, groundY - r, r, 0, false);
     });
   }
@@ -1194,21 +1263,21 @@ export class PhysicsGameEngine {
       const pos = body.position;
       const angle = body.angle;
       if (body.label.includes('egg')) {
-        // Matilda egg bomb
+        // Matilda egg bomb (bigger and clearer)
         ctx.save();
         ctx.translate(pos.x, pos.y);
         ctx.rotate(angle);
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.ellipse(0, 0, 10, 14, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, 13, 18, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = '#cccccc';
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#94a3b8';
         ctx.stroke();
         ctx.restore();
       } else {
         // Split blue bird
-        CharacterRenderer.drawChicken(ctx, 'blues', pos.x, pos.y, 14, angle, false);
+        CharacterRenderer.drawChicken(ctx, 'blues', pos.x, pos.y, 18, angle, false);
       }
     });
 
@@ -1216,7 +1285,16 @@ export class PhysicsGameEngine {
     if (this.activeChickenBody && this.currentChickenType) {
       const pos = this.activeChickenBody.position;
       const angle = this.activeChickenBody.angle;
-      const r = this.currentChickenType === 'blues' ? 16 : this.currentChickenType === 'bomb' ? 26 : 22;
+      const r =
+        this.currentChickenType === 'blues'
+          ? 22
+          : this.currentChickenType === 'bomb'
+          ? 38
+          : this.currentChickenType === 'matilda'
+          ? 34
+          : this.currentChickenType === 'chuck'
+          ? 30
+          : 32;
 
       CharacterRenderer.drawChicken(ctx, this.currentChickenType, pos.x, pos.y, r, angle, this.chickenAbilityUsed);
     }

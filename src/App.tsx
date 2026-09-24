@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GameView, LevelData, LevelProgress } from './types/game';
 import { LevelGenerator } from './game/proceduralGenerator';
 import { soundManager } from './audio/soundManager';
+import { PhysicsGameEngine } from './game/physicsEngine';
 import { StartScreen } from './components/StartScreen';
 import { LevelSelector } from './components/LevelSelector';
 import { HowToPlayModal } from './components/HowToPlayModal';
@@ -33,6 +34,9 @@ export default function App() {
   const [unusedChickens, setUnusedChickens] = useState<number>(0);
 
   // Persistent Progress (localStorage)
+  const engineRef = useRef<PhysicsGameEngine | null>(null);
+  const [isCameraAtFortress, setIsCameraAtFortress] = useState<boolean>(false);
+
   const [progress, setProgress] = useState<LevelProgress>(() => {
     try {
       const savedUnlocked = localStorage.getItem('angry_chickens_unlocked');
@@ -85,7 +89,15 @@ export default function App() {
     setIsPaused(false);
     setShowVictory(false);
     setShowGameOver(false);
+    setIsCameraAtFortress(false);
     setView('playing');
+  };
+
+  const handleToggleCameraPan = () => {
+    if (engineRef.current) {
+      engineRef.current.toggleCameraPan();
+      setIsCameraAtFortress(engineRef.current.isCameraAtFortress());
+    }
   };
 
   const handleLevelComplete = (stars: number, finalScore: number, unusedBirds: number) => {
@@ -172,6 +184,7 @@ export default function App() {
               onLevelComplete={handleLevelComplete}
               onLevelFailed={handleLevelFailed}
               isPaused={isPaused || showVictory || showGameOver}
+              engineInstanceRef={engineRef}
             />
 
             <GameHUD
@@ -186,6 +199,8 @@ export default function App() {
               onPause={() => setIsPaused(true)}
               onRestart={handleRestartLevel}
               onToggleSound={handleToggleSound}
+              onToggleCameraPan={handleToggleCameraPan}
+              isCameraAtFortress={isCameraAtFortress}
             />
           </div>
         </div>

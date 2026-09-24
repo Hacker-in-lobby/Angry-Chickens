@@ -11,6 +11,7 @@ interface GameCanvasProps {
   onLevelFailed: (score: number) => void;
   onFloatingText?: (text: string, x: number, y: number, color?: string) => void;
   isPaused: boolean;
+  engineInstanceRef?: React.MutableRefObject<PhysicsGameEngine | null>;
 }
 
 export const GameCanvas: React.FC<GameCanvasProps> = ({
@@ -22,11 +23,17 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   onLevelFailed,
   onFloatingText,
   isPaused,
+  engineInstanceRef,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<PhysicsGameEngine | null>(null);
   const animFrameRef = useRef<number | null>(null);
+
+  // Interaction tracking
   const isDraggingSlingRef = useRef<boolean>(false);
+  const isPanningCameraRef = useRef<boolean>(false);
+  const lastPointerPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const pointerDownPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const activePointerIdRef = useRef<number | null>(null);
 
   // Logical game resolution (16:9)
@@ -51,6 +58,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     });
 
     engineRef.current = engine;
+    if (engineInstanceRef) {
+      engineInstanceRef.current = engine;
+    }
     engine.loadLevel(level);
 
     let lastTime = performance.now();
@@ -75,6 +85,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       }
       engine.destroy();
       engineRef.current = null;
+      if (engineInstanceRef) {
+        engineInstanceRef.current = null;
+      }
     };
   }, [level]);
 
@@ -105,31 +118,69 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     e.preventDefault();
 
     const { x, y } = getCanvasCoords(e.clientX, e.clientY);
+    lastPointerPosRef.current = { x: e.clientX, y: e.clientY };
+    pointerDownPosRef.current = { x: e.clientX, y: e.clientY };
+
     const pulled = engineRef.current?.startPull(x, y);
 
     if (pulled) {
       isDraggingSlingRef.current = true;
+      isPanningCameraRef.current = false;
       activePointerIdRef.current = e.pointerId;
       try {
         e.currentTarget.setPointerCapture(e.pointerId);
       } catch {}
     } else {
-      // Tap in flight for special bird ability
-      engineRef.current?.triggerAbility();
+      // Touch outside slingshot: initiate landscape scrolling / camera pan!
+      isPanningCameraRef.current = true;
+      isDraggingSlingRef.current = false;
+      activePointerIdRef.current = e.pointerId;
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {}
     }
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (isPaused || !isDraggingSlingRef.current) return;
-    e.preventDefault();
-    const { x, y } = getCanvasCoords(e.clientX, e.clientY);
-    engineRef.current?.updatePull(x, y);
+    if (isPaused) return;
+
+    if (isDraggingSlingRef.current) {
+      const { x, y } = getCanvasCoords(e.clientX, e.clientY);
+      engineRef.current?.updatePull(x, y);
+    } else if (isPanningCameraRef.current) {
+      // Responsive, fluid landscape camera panning / scrolling
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = rect.width > 0 ? GAME_WIDTH / rect.width : 1;
+
+      const deltaX = (e.clientX - lastPointerPosRef.current.x) * scaleX;
+      // Dragging left scrolls camera right into the fortress
+      engineRef.current?.panCamera(-deltaX);
+      lastPointerPosRef.current = { x: e.clientX, y: e.clientY };
+    }
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (isPaused || !isDraggingSlingRef.current) return;
-    e.preventDefault();
-    isDraggingSlingRef.current = false;
+    if (isPaused) return;
+
+    if (isDraggingSlingRef.current) {
+      isDraggingSlingRef.current = false;
+      engineRef.current?.releasePull();
+    } else if (isPanningCameraRef.current) {
+      isPanningCameraRef.current = false;
+
+      // Check if it was a stationary tap or quick click (not a drag)
+      const dist = Math.hypot(
+        e.clientX - pointerDownPosRef.current.x,
+        e.clientY - pointerDownPosRef.current.y
+      );
+
+      // Short tap: trigger in-flight bird ability!
+      if (dist < 12) {
+        engineRef.current?.triggerAbility();
+      }
+    }
 
     if (activePointerIdRef.current !== null) {
       try {
@@ -137,13 +188,14 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       } catch {}
       activePointerIdRef.current = null;
     }
-
-    engineRef.current?.releasePull();
   };
 
   const handlePointerCancel = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDraggingSlingRef.current) return;
-    isDraggingSlingRef.current = false;
+    if (isDraggingSlingRef.current) {
+      isDraggingSlingRef.current = false;
+      engineRef.current?.releasePull();
+    }
+    isPanningCameraRef.current = false;
 
     if (activePointerIdRef.current !== null) {
       try {
@@ -151,8 +203,13 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       } catch {}
       activePointerIdRef.current = null;
     }
+  };
 
-    engineRef.current?.releasePull();
+  // Support trackpad / mouse wheel horizontal scrolling
+  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    if (isPaused) return;
+    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    engineRef.current?.panCamera(delta * 0.9);
   };
 
   return (
@@ -162,13 +219,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
-      onTouchStart={(e) => {
-        // Prevent mobile browser drag / bounce gestures
-        if (e.cancelable) e.preventDefault();
-      }}
-      onTouchMove={(e) => {
-        if (e.cancelable) e.preventDefault();
-      }}
+      onWheel={handleWheel}
       className="w-full h-full block cursor-crosshair touch-none select-none"
       style={{
         touchAction: 'none',

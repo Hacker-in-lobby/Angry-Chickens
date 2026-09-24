@@ -589,324 +589,739 @@ export class CharacterRenderer {
     ctx.restore();
   }
 
-  // RED CHICKEN (Cluck / Leader)
+  // RED CHICKEN (Cluck / Leader) - Enhanced High-Fidelity Graphics
   private static drawRedChicken(ctx: CanvasRenderingContext2D, r: number) {
-    // Tail feathers
-    ctx.fillStyle = '#1c1c1c';
+    // Tail feathers (3 dynamic layered black feathers with outline)
+    ctx.fillStyle = '#18181b';
     ctx.beginPath();
-    ctx.moveTo(-r * 0.9, -r * 0.1);
-    ctx.lineTo(-r * 1.35, -r * 0.3);
-    ctx.lineTo(-r * 1.25, -r * 0.05);
-    ctx.lineTo(-r * 1.45, r * 0.1);
-    ctx.lineTo(-r * 0.9, r * 0.15);
+    ctx.moveTo(-r * 0.85, -r * 0.1);
+    ctx.lineTo(-r * 1.5, -r * 0.38);
+    ctx.lineTo(-r * 1.32, -r * 0.08);
+    ctx.lineTo(-r * 1.6, 0.08);
+    ctx.lineTo(-r * 1.28, 0.2);
+    ctx.lineTo(-r * 1.45, 0.36);
+    ctx.lineTo(-r * 0.85, 0.2);
     ctx.closePath();
     ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#09090b';
+    ctx.stroke();
 
-    // Crest feathers on head
-    ctx.fillStyle = '#d91d24';
+    // Crest feathers on head (2 fluid organic tufts)
+    const crestGrad = ctx.createLinearGradient(0, -r * 1.55, 0, -r * 0.8);
+    crestGrad.addColorStop(0, '#f87171');
+    crestGrad.addColorStop(1, '#dc2626');
+    ctx.fillStyle = crestGrad;
     ctx.beginPath();
-    ctx.moveTo(-r * 0.1, -r * 0.95);
-    ctx.quadraticCurveTo(-r * 0.2, -r * 1.45, -r * 0.45, -r * 1.4);
-    ctx.quadraticCurveTo(-r * 0.1, -r * 1.15, 0, -r * 0.98);
-    ctx.quadraticCurveTo(r * 0.15, -r * 1.4, 0, -r * 1.48);
-    ctx.quadraticCurveTo(r * 0.25, -r * 1.15, r * 0.2, -r * 0.95);
+    ctx.moveTo(-r * 0.15, -r * 0.92);
+    ctx.quadraticCurveTo(-r * 0.35, -r * 1.52, -r * 0.65, -r * 1.45);
+    ctx.quadraticCurveTo(-r * 0.2, -r * 1.15, -r * 0.05, -r * 0.98);
+    ctx.quadraticCurveTo(r * 0.1, -r * 1.56, -r * 0.08, -r * 1.62);
+    ctx.quadraticCurveTo(r * 0.3, -r * 1.2, r * 0.22, -r * 0.92);
     ctx.closePath();
     ctx.fill();
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#991b1b';
+    ctx.stroke();
 
-    // Main red spherical body
-    const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
-    bodyGrad.addColorStop(0, '#f23a3a');
-    bodyGrad.addColorStop(0.7, '#d91d24');
-    bodyGrad.addColorStop(1, '#9e0d13');
+    // Main red spherical body with rich 3D sphere gradient
+    const bodyGrad = ctx.createRadialGradient(-r * 0.32, -r * 0.32, r * 0.08, 0, 0, r);
+    bodyGrad.addColorStop(0, '#ff5252');
+    bodyGrad.addColorStop(0.35, '#ef233c');
+    bodyGrad.addColorStop(0.75, '#c9182b');
+    bodyGrad.addColorStop(1, '#660713');
 
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fill();
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = '#78080c';
+    ctx.lineWidth = 3.2;
+    ctx.strokeStyle = '#4a040d';
     ctx.stroke();
 
-    // Pale beige/white belly
-    ctx.fillStyle = '#fcebd2';
+    // Glossy 3D specular highlight arc on forehead
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.38)';
+    ctx.lineWidth = r * 0.12;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.ellipse(r * 0.15, r * 0.35, r * 0.55, r * 0.45, 0, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.arc(-r * 0.15, -r * 0.25, r * 0.58, -Math.PI * 0.75, -Math.PI * 0.3);
+    ctx.stroke();
+    ctx.restore();
 
-    // Fierce Angry Eyebrows (Black V-shape)
-    ctx.fillStyle = '#1c1c1c';
+    // Soft warm cream belly with feathered curve
+    const bellyGrad = ctx.createLinearGradient(0, r * 0.1, 0, r * 0.95);
+    bellyGrad.addColorStop(0, '#fff4e6');
+    bellyGrad.addColorStop(1, '#fed7aa');
+    ctx.fillStyle = bellyGrad;
     ctx.beginPath();
-    ctx.moveTo(-r * 0.1, -r * 0.1);
-    ctx.lineTo(-r * 0.65, -r * 0.38);
-    ctx.lineTo(-r * 0.65, -r * 0.18);
-    ctx.lineTo(0, -r * 0.02);
-    ctx.lineTo(r * 0.65, -r * 0.18);
-    ctx.lineTo(r * 0.65, -r * 0.38);
-    ctx.lineTo(r * 0.1, -r * 0.1);
-    ctx.closePath();
-    ctx.fill();
-
-    // Eyes
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(-r * 0.25, -r * 0.05, r * 0.22, 0, Math.PI * 2);
-    ctx.arc(r * 0.25, -r * 0.05, r * 0.22, 0, Math.PI * 2);
+    ctx.ellipse(r * 0.1, r * 0.44, r * 0.58, r * 0.44, 0.08, 0, Math.PI * 2);
     ctx.fill();
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = '#222';
+    ctx.strokeStyle = '#e0a96d';
+    ctx.stroke();
+
+    // Detailed side wing feather with layered feathers
+    ctx.save();
+    ctx.fillStyle = '#b91c1c';
+    ctx.strokeStyle = '#7f1d1d';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.55, 0.05);
+    ctx.quadraticCurveTo(-r * 0.82, 0.15, -r * 0.85, 0.42);
+    ctx.quadraticCurveTo(-r * 0.7, 0.58, -r * 0.45, 0.54);
+    ctx.quadraticCurveTo(-r * 0.28, 0.48, -r * 0.35, 0.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // Inner wing line
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.72, 0.28);
+    ctx.quadraticCurveTo(-r * 0.55, 0.38, -r * 0.4, 0.36);
+    ctx.stroke();
+    ctx.restore();
+
+    // Dark feather spots on cheeks
+    ctx.fillStyle = '#831843';
+    ctx.beginPath();
+    ctx.arc(-r * 0.62, r * 0.12, r * 0.07, 0, Math.PI * 2);
+    ctx.arc(-r * 0.52, r * 0.26, r * 0.05, 0, Math.PI * 2);
+    ctx.arc(r * 0.62, r * 0.12, r * 0.07, 0, Math.PI * 2);
+    ctx.arc(r * 0.52, r * 0.26, r * 0.05, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Big expressive cartoon eyes
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.26, -r * 0.05, r * 0.26, 0, Math.PI * 2);
+    ctx.arc(r * 0.26, -r * 0.05, r * 0.26, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#18181b';
+    ctx.stroke();
+
+    // Focused black pupils
+    ctx.fillStyle = '#09090b';
+    ctx.beginPath();
+    ctx.arc(-r * 0.17, -r * 0.04, r * 0.13, 0, Math.PI * 2);
+    ctx.arc(r * 0.17, -r * 0.04, r * 0.13, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Dual catchlight reflections
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.21, -r * 0.09, r * 0.05, 0, Math.PI * 2);
+    ctx.arc(r * 0.13, -r * 0.09, r * 0.05, 0, Math.PI * 2);
+    ctx.arc(-r * 0.14, -r * 0.01, r * 0.025, 0, Math.PI * 2);
+    ctx.arc(r * 0.2, -r * 0.01, r * 0.025, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Fierce Iconic Angry Eyebrows (Sculpted heavy V-brow)
+    ctx.fillStyle = '#18181b';
+    ctx.beginPath();
+    ctx.moveTo(0, r * 0.03);
+    ctx.lineTo(-r * 0.74, -r * 0.24);
+    ctx.lineTo(-r * 0.74, -r * 0.46);
+    ctx.lineTo(-r * 0.08, -r * 0.15);
+    ctx.lineTo(r * 0.08, -r * 0.15);
+    ctx.lineTo(r * 0.74, -r * 0.46);
+    ctx.lineTo(r * 0.74, -r * 0.24);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000000';
+    ctx.stroke();
+
+    // Beak (Sharp bright sculpted golden bill)
+    const beakGrad = ctx.createLinearGradient(0, -r * 0.05, 0, r * 0.4);
+    beakGrad.addColorStop(0, '#fef08a');
+    beakGrad.addColorStop(0.35, '#facc15');
+    beakGrad.addColorStop(1, '#ea580c');
+    ctx.fillStyle = beakGrad;
+
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.24, 0);
+    ctx.lineTo(r * 0.24, 0);
+    ctx.lineTo(0, r * 0.4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#9a3412';
+    ctx.stroke();
+
+    // Beak split seam & nostrils
+    ctx.fillStyle = '#7c2d12';
+    ctx.fillRect(-r * 0.14, r * 0.12, r * 0.28, 2.2);
+    ctx.beginPath();
+    ctx.arc(-r * 0.07, r * 0.05, 1.8, 0, Math.PI * 2);
+    ctx.arc(r * 0.07, r * 0.05, 1.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // CHUCK (Yellow Triangle - Speedster) - Enhanced High-Fidelity Graphics
+  private static drawChuckChicken(ctx: CanvasRenderingContext2D, r: number, boosted: boolean) {
+    if (boosted) {
+      // Speed dash flame aura & streaks
+      ctx.save();
+      const auraGrad = ctx.createRadialGradient(0, 0, r * 0.5, 0, 0, r * 2.0);
+      auraGrad.addColorStop(0, 'rgba(255, 235, 59, 0.7)');
+      auraGrad.addColorStop(0.5, 'rgba(255, 112, 67, 0.45)');
+      auraGrad.addColorStop(1, 'rgba(255, 87, 34, 0)');
+      ctx.fillStyle = auraGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 2.0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Trailing speed lines behind
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(-r * 1.3, -r * 0.45);
+      ctx.lineTo(-r * 2.2, -r * 0.45);
+      ctx.moveTo(-r * 1.4, 0);
+      ctx.lineTo(-r * 2.5, 0);
+      ctx.moveTo(-r * 1.3, r * 0.45);
+      ctx.lineTo(-r * 2.2, r * 0.45);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Black tail feathers
+    ctx.fillStyle = '#18181b';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.85, -r * 0.1);
+    ctx.lineTo(-r * 1.55, -r * 0.32);
+    ctx.lineTo(-r * 1.38, -r * 0.05);
+    ctx.lineTo(-r * 1.65, 0.16);
+    ctx.lineTo(-r * 0.85, 0.16);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000000';
+    ctx.stroke();
+
+    // Spiky punk head crest (4 prominent sharp black feathers)
+    ctx.fillStyle = '#18181b';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.3, -r * 0.7);
+    ctx.lineTo(-r * 0.85, -r * 1.6);
+    ctx.lineTo(-r * 0.28, -r * 1.18);
+    ctx.lineTo(-r * 0.12, -r * 1.72);
+    ctx.lineTo(0.06, -r * 1.18);
+    ctx.lineTo(r * 0.34, -r * 1.55);
+    ctx.lineTo(r * 0.16, -r * 0.88);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#09090b';
+    ctx.stroke();
+
+    // Yellow triangular body with aerodynamic curvature
+    const bodyGrad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r * 1.25);
+    bodyGrad.addColorStop(0, '#fef08a');
+    bodyGrad.addColorStop(0.3, '#fde047');
+    bodyGrad.addColorStop(0.7, '#eab308');
+    bodyGrad.addColorStop(1, '#854d0e');
+
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    ctx.moveTo(r * 1.2, 0); // nose point
+    ctx.quadraticCurveTo(0, r * 0.95, -r * 0.92, r * 0.92); // bottom edge
+    ctx.quadraticCurveTo(-r * 0.78, 0, -r * 0.92, -r * 0.92); // back edge
+    ctx.quadraticCurveTo(0, -r * 0.95, r * 1.2, 0); // top edge
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#713f12';
+    ctx.stroke();
+
+    // Glossy 3D sheen on Chuck's back
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.lineWidth = r * 0.1;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.4, -r * 0.65);
+    ctx.quadraticCurveTo(0, -r * 0.65, r * 0.5, -r * 0.2);
+    ctx.stroke();
+    ctx.restore();
+
+    // Lighter belly sheen
+    ctx.fillStyle = '#fef9c3';
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.15, r * 0.48, r * 0.52, r * 0.28, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Chuck's aerodynamic side wing
+    ctx.save();
+    ctx.fillStyle = '#ca8a04';
+    ctx.strokeStyle = '#713f12';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.55, 0.05);
+    ctx.lineTo(-r * 0.75, 0.35);
+    ctx.lineTo(-r * 0.35, 0.45);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // Fierce angled chestnut eyebrows
+    ctx.fillStyle = '#7c2d12';
+    ctx.beginPath();
+    ctx.moveTo(r * 0.4, -r * 0.06);
+    ctx.lineTo(-r * 0.58, -r * 0.44);
+    ctx.lineTo(-r * 0.52, -r * 0.25);
+    ctx.lineTo(-r * 0.06, -r * 0.1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = '#451a03';
+    ctx.stroke();
+
+    // Big determined eyes
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.08, -r * 0.04, r * 0.24, 0, Math.PI * 2);
+    ctx.arc(r * 0.25, -r * 0.04, r * 0.24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#1c1917';
     ctx.stroke();
 
     // Pupils
-    ctx.fillStyle = '#111111';
+    ctx.fillStyle = '#0c0a09';
     ctx.beginPath();
-    ctx.arc(-r * 0.18, -r * 0.05, r * 0.1, 0, Math.PI * 2);
-    ctx.arc(r * 0.18, -r * 0.05, r * 0.1, 0, Math.PI * 2);
+    ctx.arc(-r * 0.02, -r * 0.04, r * 0.11, 0, Math.PI * 2);
+    ctx.arc(r * 0.29, -r * 0.04, r * 0.11, 0, Math.PI * 2);
     ctx.fill();
 
-    // Beak (Sharp orange/yellow)
-    ctx.fillStyle = '#fca510';
-    ctx.beginPath();
-    ctx.moveTo(-r * 0.18, 0);
-    ctx.lineTo(r * 0.18, 0);
-    ctx.lineTo(0, r * 0.35);
-    ctx.closePath();
-    ctx.fill();
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = '#c47802';
-    ctx.stroke();
-  }
-
-  // CHUCK (Yellow Triangle - Speedster)
-  private static drawChuckChicken(ctx: CanvasRenderingContext2D, r: number, boosted: boolean) {
-    if (boosted) {
-      // Flame trail / speed aura
-      ctx.fillStyle = 'rgba(255, 120, 0, 0.4)';
-      ctx.beginPath();
-      ctx.arc(0, 0, r * 1.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Black spiky crest on top
-    ctx.fillStyle = '#1c1c1c';
-    ctx.beginPath();
-    ctx.moveTo(-r * 0.2, -r * 0.8);
-    ctx.lineTo(-r * 0.6, -r * 1.4);
-    ctx.lineTo(-r * 0.1, -r * 1.05);
-    ctx.lineTo(0, -r * 1.5);
-    ctx.lineTo(r * 0.1, -r * 0.95);
-    ctx.closePath();
-    ctx.fill();
-
-    // Yellow triangular body
-    const bodyGrad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r);
-    bodyGrad.addColorStop(0, '#fff44f');
-    bodyGrad.addColorStop(0.7, '#fcd215');
-    bodyGrad.addColorStop(1, '#d49b08');
-
-    ctx.fillStyle = bodyGrad;
-    ctx.beginPath();
-    ctx.moveTo(r * 1.1, 0);
-    ctx.lineTo(-r * 0.85, -r * 0.95);
-    ctx.lineTo(-r * 0.85, r * 0.95);
-    ctx.closePath();
-    ctx.fill();
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = '#a67202';
-    ctx.stroke();
-
-    // Brown angry eyebrows
-    ctx.fillStyle = '#9e2d09';
-    ctx.beginPath();
-    ctx.moveTo(-r * 0.1, -r * 0.15);
-    ctx.lineTo(-r * 0.5, -r * 0.35);
-    ctx.lineTo(-r * 0.45, -r * 0.2);
-    ctx.lineTo(r * 0.35, -r * 0.05);
-    ctx.closePath();
-    ctx.fill();
-
-    // Eyes
+    // Highlights
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(-r * 0.08, -r * 0.05, r * 0.2, 0, Math.PI * 2);
-    ctx.arc(r * 0.22, -r * 0.05, r * 0.2, 0, Math.PI * 2);
+    ctx.arc(-r * 0.05, -r * 0.09, r * 0.045, 0, Math.PI * 2);
+    ctx.arc(r * 0.26, -r * 0.09, r * 0.045, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(-r * 0.04, -r * 0.05, r * 0.09, 0, Math.PI * 2);
-    ctx.arc(r * 0.26, -r * 0.05, r * 0.09, 0, Math.PI * 2);
-    ctx.fill();
+    // Long razor-sharp yellow/orange beak
+    const beakGrad = ctx.createLinearGradient(0, 0, r * 0.9, r * 0.15);
+    beakGrad.addColorStop(0, '#fde047');
+    beakGrad.addColorStop(0.55, '#f97316');
+    beakGrad.addColorStop(1, '#c2410c');
+    ctx.fillStyle = beakGrad;
 
-    // Long yellow/orange beak
-    ctx.fillStyle = '#f78d11';
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(r * 0.75, r * 0.1);
-    ctx.lineTo(0, r * 0.28);
+    ctx.moveTo(0, -r * 0.03);
+    ctx.lineTo(r * 0.92, r * 0.1);
+    ctx.lineTo(0, r * 0.34);
     ctx.closePath();
     ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#9a3412';
+    ctx.stroke();
+
+    // Beak seam
+    ctx.strokeStyle = '#7c2d12';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(0, r * 0.15);
+    ctx.lineTo(r * 0.92, r * 0.1);
+    ctx.stroke();
   }
 
-  // THE BLUES (Cute Blue Birds - Splitter)
+  // THE BLUES (Cute Blue Birds - Splitter) - Enhanced High-Fidelity Graphics
   private static drawBluesChicken(ctx: CanvasRenderingContext2D, r: number) {
-    // Cute cyan body
-    const bodyGrad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r);
-    bodyGrad.addColorStop(0, '#56d4f7');
-    bodyGrad.addColorStop(0.7, '#24a5e0');
-    bodyGrad.addColorStop(1, '#0c6999');
-
-    ctx.fillStyle = bodyGrad;
+    // Tail feather
+    ctx.fillStyle = '#18181b';
     ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.moveTo(-r * 0.9, 0);
+    ctx.lineTo(-r * 1.4, -r * 0.22);
+    ctx.lineTo(-r * 1.34, r * 0.12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = '#000000';
+    ctx.stroke();
+
+    // Head crest feather (cute single tuft)
+    ctx.fillStyle = '#0284c7';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.1, -r * 0.95);
+    ctx.quadraticCurveTo(-r * 0.22, -r * 1.5, -r * 0.48, -r * 1.44);
+    ctx.quadraticCurveTo(-r * 0.1, -r * 1.15, 0.1, -r * 0.95);
+    ctx.closePath();
     ctx.fill();
     ctx.lineWidth = 2;
-    ctx.strokeStyle = '#0a5278';
+    ctx.strokeStyle = '#0369a1';
     ctx.stroke();
 
-    // Cheerful big eyes
+    // Electric cyan body with deep cobalt 3D shading
+    const bodyGrad = ctx.createRadialGradient(-r * 0.28, -r * 0.28, r * 0.08, 0, 0, r);
+    bodyGrad.addColorStop(0, '#7dd3fc');
+    bodyGrad.addColorStop(0.35, '#38bdf8');
+    bodyGrad.addColorStop(0.75, '#0284c7');
+    bodyGrad.addColorStop(1, '#075985');
+
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 2.8;
+    ctx.strokeStyle = '#0c4a6e';
+    ctx.stroke();
+
+    // 3D highlight arc
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.42)';
+    ctx.lineWidth = r * 0.1;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(-r * 0.15, -r * 0.2, r * 0.58, -Math.PI * 0.75, -Math.PI * 0.25);
+    ctx.stroke();
+    ctx.restore();
+
+    // Cute little wing on side
+    ctx.save();
+    ctx.fillStyle = '#0369a1';
+    ctx.strokeStyle = '#0c4a6e';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.58, 0.18, r * 0.26, r * 0.18, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // Peach cheek blush
+    ctx.fillStyle = 'rgba(249, 115, 22, 0.7)';
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.65, r * 0.2, r * 0.18, r * 0.12, 0, 0, Math.PI * 2);
+    ctx.ellipse(r * 0.65, r * 0.2, r * 0.18, r * 0.12, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Enormous adorable anime eyes
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(-r * 0.28, -r * 0.1, r * 0.28, 0, Math.PI * 2);
-    ctx.arc(r * 0.28, -r * 0.1, r * 0.28, 0, Math.PI * 2);
+    ctx.arc(-r * 0.28, -r * 0.08, r * 0.33, 0, Math.PI * 2);
+    ctx.arc(r * 0.28, -r * 0.08, r * 0.33, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#0f172a';
+    ctx.stroke();
+
+    // Big shiny dark pupils
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(-r * 0.2, -r * 0.06, r * 0.19, 0, Math.PI * 2);
+    ctx.arc(r * 0.2, -r * 0.06, r * 0.19, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#111';
+    // Sparkling eye reflections
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(-r * 0.2, -r * 0.1, r * 0.14, 0, Math.PI * 2);
-    ctx.arc(r * 0.2, -r * 0.1, r * 0.14, 0, Math.PI * 2);
+    ctx.arc(-r * 0.24, -r * 0.13, r * 0.085, 0, Math.PI * 2);
+    ctx.arc(r * 0.16, -r * 0.13, r * 0.085, 0, Math.PI * 2);
+    ctx.arc(-r * 0.14, 0, r * 0.04, 0, Math.PI * 2);
+    ctx.arc(r * 0.24, 0, r * 0.04, 0, Math.PI * 2);
     ctx.fill();
 
-    // Orange tuft cheeks
-    ctx.fillStyle = '#f07d24';
-    ctx.beginPath();
-    ctx.arc(-r * 0.65, r * 0.2, r * 0.15, 0, Math.PI * 2);
-    ctx.arc(r * 0.65, r * 0.2, r * 0.15, 0, Math.PI * 2);
-    ctx.fill();
+    // Cheerful bright orange beak with tiny smirk
+    const beakGrad = ctx.createLinearGradient(0, 0, 0, r * 0.38);
+    beakGrad.addColorStop(0, '#fbbf24');
+    beakGrad.addColorStop(1, '#ea580c');
+    ctx.fillStyle = beakGrad;
 
-    // Small orange beak
-    ctx.fillStyle = '#fc9919';
     ctx.beginPath();
-    ctx.moveTo(-r * 0.15, 0.05);
-    ctx.lineTo(r * 0.15, 0.05);
-    ctx.lineTo(0, r * 0.35);
+    ctx.moveTo(-r * 0.19, 0.04);
+    ctx.lineTo(r * 0.19, 0.04);
+    ctx.lineTo(0, r * 0.4);
     ctx.closePath();
     ctx.fill();
+    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = '#9a3412';
+    ctx.stroke();
   }
 
-  // BOMB (Black Chicken - Explosive)
+  // BOMB (Black Chicken - Explosive) - Enhanced High-Fidelity Graphics
   private static drawBombChicken(ctx: CanvasRenderingContext2D, r: number, fuseLit: boolean) {
-    // Top fuse feather
-    ctx.fillStyle = '#111';
-    ctx.fillRect(-2, -r * 1.3, 4, r * 0.4);
+    // Brass / Gold metallic fuse collar ring
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.roundRect(-r * 0.22, -r * 1.08, r * 0.44, r * 0.18, 4);
+    ctx.fill();
+    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = '#b45309';
+    ctx.stroke();
+
+    // Twisted rope fuse cord
+    ctx.strokeStyle = '#78716c';
+    ctx.lineWidth = 4.5;
+    ctx.beginPath();
+    ctx.moveTo(0, -r * 1.08);
+    ctx.quadraticCurveTo(r * 0.24, -r * 1.4, 0, -r * 1.62);
+    ctx.stroke();
 
     if (fuseLit) {
-      // Sparks & flame on fuse
-      ctx.fillStyle = '#ff3300';
+      // Animated explosive fiery sparks and embers
+      ctx.save();
+      const sparkGrad = ctx.createRadialGradient(0, -r * 1.65, 2, 0, -r * 1.65, r * 0.55);
+      sparkGrad.addColorStop(0, '#ffffff');
+      sparkGrad.addColorStop(0.3, '#fde047');
+      sparkGrad.addColorStop(0.7, '#ea580c');
+      sparkGrad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+      ctx.fillStyle = sparkGrad;
       ctx.beginPath();
-      ctx.arc(0, -r * 1.35, r * 0.3, 0, Math.PI * 2);
+      ctx.arc(0, -r * 1.65, r * 0.55, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#ffea00';
+
+      // Sharp radiating spark rays
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 2.4;
+      for (let a = 0; a < 8; a++) {
+        const ang = (a * Math.PI) / 4;
+        ctx.beginPath();
+        ctx.moveTo(0, -r * 1.65);
+        ctx.lineTo(Math.cos(ang) * (r * 0.6), -r * 1.65 + Math.sin(ang) * (r * 0.6));
+        ctx.stroke();
+      }
+      ctx.restore();
+    } else {
+      // Idle burning ember
+      ctx.fillStyle = '#dc2626';
       ctx.beginPath();
-      ctx.arc(0, -r * 1.35, r * 0.16, 0, Math.PI * 2);
+      ctx.arc(0, -r * 1.62, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(0, -r * 1.62, 2.2, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Heavy round body
-    const bodyGrad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r);
+    // Heavy round obsidian sphere with ambient rim light
+    const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
     if (fuseLit) {
-      bodyGrad.addColorStop(0, '#5a1215');
-      bodyGrad.addColorStop(0.7, '#851218');
-      bodyGrad.addColorStop(1, '#3b0609');
+      bodyGrad.addColorStop(0, '#991b1b');
+      bodyGrad.addColorStop(0.4, '#581c87');
+      bodyGrad.addColorStop(0.85, '#1c1917');
+      bodyGrad.addColorStop(1, '#09090b');
     } else {
-      bodyGrad.addColorStop(0, '#424242');
-      bodyGrad.addColorStop(0.7, '#242424');
-      bodyGrad.addColorStop(1, '#0d0d0d');
+      bodyGrad.addColorStop(0, '#52525b');
+      bodyGrad.addColorStop(0.35, '#27272a');
+      bodyGrad.addColorStop(0.8, '#18181b');
+      bodyGrad.addColorStop(1, '#09090b');
     }
 
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fill();
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = '#050505';
+    ctx.lineWidth = 3.6;
+    ctx.strokeStyle = '#000000';
     ctx.stroke();
 
-    // Red dot on forehead
-    ctx.fillStyle = '#e62229';
+    // 3D glossy highlight rim
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = r * 0.12;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(0, -r * 0.45, r * 0.14, 0, Math.PI * 2);
+    ctx.arc(-r * 0.15, -r * 0.25, r * 0.58, -Math.PI * 0.75, -Math.PI * 0.28);
+    ctx.stroke();
+    ctx.restore();
+
+    // Heavy iron side wing
+    ctx.save();
+    ctx.fillStyle = '#27272a';
+    ctx.strokeStyle = '#09090b';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.62, 0.2, r * 0.28, r * 0.2, -0.2, 0, Math.PI * 2);
     ctx.fill();
+    ctx.stroke();
+    ctx.restore();
 
-    // Intense fiery eyebrows
-    ctx.fillStyle = '#c72e0a';
-    ctx.fillRect(-r * 0.6, -r * 0.25, r * 1.2, r * 0.12);
-
-    // Eyes
+    // Glowing target dot on forehead
+    ctx.fillStyle = fuseLit ? '#facc15' : '#ef4444';
+    ctx.beginPath();
+    ctx.arc(0, -r * 0.48, r * 0.15, 0, Math.PI * 2);
+    ctx.fill();
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(-r * 0.26, -r * 0.05, r * 0.18, 0, Math.PI * 2);
-    ctx.arc(r * 0.26, -r * 0.05, r * 0.18, 0, Math.PI * 2);
+    ctx.arc(0, -r * 0.48, r * 0.05, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#111';
+    // Intense fiery orange-red furrowed eyebrows
+    ctx.fillStyle = '#ea580c';
     ctx.beginPath();
-    ctx.arc(-r * 0.2, -r * 0.05, r * 0.09, 0, Math.PI * 2);
-    ctx.arc(r * 0.2, -r * 0.05, r * 0.09, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Grey beak
-    ctx.fillStyle = '#e09819';
-    ctx.beginPath();
-    ctx.moveTo(-r * 0.15, 0.05);
-    ctx.lineTo(r * 0.15, 0.05);
-    ctx.lineTo(0, r * 0.35);
+    ctx.moveTo(0, -r * 0.1);
+    ctx.lineTo(-r * 0.78, -r * 0.4);
+    ctx.lineTo(-r * 0.72, -r * 0.22);
+    ctx.lineTo(0, -r * 0.02);
+    ctx.lineTo(r * 0.72, -r * 0.22);
+    ctx.lineTo(r * 0.78, -r * 0.4);
     ctx.closePath();
     ctx.fill();
+    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = '#9a3412';
+    ctx.stroke();
+
+    // Round determined white eyes
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.28, -r * 0.04, r * 0.21, 0, Math.PI * 2);
+    ctx.arc(r * 0.28, -r * 0.04, r * 0.21, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#000000';
+    ctx.stroke();
+
+    // Pinpoint intense pupils
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(-r * 0.21, -r * 0.04, r * 0.1, 0, Math.PI * 2);
+    ctx.arc(r * 0.21, -r * 0.04, r * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Small eye reflection
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.24, -r * 0.08, 3, 0, Math.PI * 2);
+    ctx.arc(r * 0.18, -r * 0.08, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Solid gunmetal/amber beak
+    const beakGrad = ctx.createLinearGradient(0, 0, 0, r * 0.38);
+    beakGrad.addColorStop(0, '#fde047');
+    beakGrad.addColorStop(0.5, '#d97706');
+    beakGrad.addColorStop(1, '#92400e');
+    ctx.fillStyle = beakGrad;
+
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.19, 0.04);
+    ctx.lineTo(r * 0.19, 0.04);
+    ctx.lineTo(0, r * 0.4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#78350f';
+    ctx.stroke();
   }
 
-  // MATILDA (White Chicken - Egg Bomber)
+  // MATILDA (White Chicken - Egg Bomber) - Enhanced High-Fidelity Graphics
   private static drawMatildaChicken(ctx: CanvasRenderingContext2D, r: number) {
-    // White oval body
-    const bodyGrad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, r * 0.1, 0, 0, r);
+    // 3 Sleek black tail feathers
+    ctx.fillStyle = '#18181b';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.75, r * 0.1);
+    ctx.lineTo(-r * 1.4, -r * 0.12);
+    ctx.lineTo(-r * 1.28, r * 0.15);
+    ctx.lineTo(-r * 1.5, r * 0.38);
+    ctx.lineTo(-r * 0.75, r * 0.35);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000000';
+    ctx.stroke();
+
+    // Elegant black and pink crest feathers on top
+    ctx.fillStyle = '#18181b';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.1, -r * 1.05);
+    ctx.quadraticCurveTo(-r * 0.32, -r * 1.55, -r * 0.54, -r * 1.48);
+    ctx.quadraticCurveTo(-r * 0.15, -r * 1.2, 0.05, -r * 1.05);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#f472b6';
+    ctx.beginPath();
+    ctx.moveTo(0, -r * 1.05);
+    ctx.quadraticCurveTo(r * 0.22, -r * 1.5, r * 0.44, -r * 1.4);
+    ctx.quadraticCurveTo(r * 0.15, -r * 1.15, 0.15, -r * 1.0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Pristine pearlescent white oval body with soft ambient shading
+    const bodyGrad = ctx.createRadialGradient(-r * 0.25, -r * 0.25, r * 0.1, 0, 0, r * 1.1);
     bodyGrad.addColorStop(0, '#ffffff');
-    bodyGrad.addColorStop(0.7, '#f0f0f0');
-    bodyGrad.addColorStop(1, '#c9c9c9');
+    bodyGrad.addColorStop(0.5, '#f8fafc');
+    bodyGrad.addColorStop(0.85, '#e2e8f0');
+    bodyGrad.addColorStop(1, '#94a3b8');
 
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-    ctx.ellipse(0, 0, r * 0.85, r * 1.05, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, r * 0.9, r * 1.1, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = '#8c8c8c';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#64748b';
     ctx.stroke();
 
-    // Pink rosy cheeks
-    ctx.fillStyle = '#f78da3';
+    // Specular shine on Matilda's forehead
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.lineWidth = r * 0.1;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(-r * 0.45, r * 0.15, r * 0.18, 0, Math.PI * 2);
-    ctx.arc(r * 0.45, r * 0.15, r * 0.18, 0, Math.PI * 2);
+    ctx.ellipse(-r * 0.15, -r * 0.35, r * 0.45, r * 0.3, -0.4, -Math.PI * 0.7, -Math.PI * 0.2);
+    ctx.stroke();
+    ctx.restore();
+
+    // White rounded side wing with feather detail
+    ctx.save();
+    ctx.fillStyle = '#f1f5f9';
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.58, 0.18, r * 0.28, r * 0.2, -0.25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // Pretty pink blush cheeks
+    ctx.fillStyle = 'rgba(244, 114, 182, 0.65)';
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.48, r * 0.18, r * 0.19, r * 0.13, 0, 0, Math.PI * 2);
+    ctx.ellipse(r * 0.48, r * 0.18, r * 0.19, r * 0.13, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Big eyes
-    ctx.fillStyle = '#111';
+    // Big gentle cartoon eyes
+    ctx.fillStyle = '#0f172a';
     ctx.beginPath();
-    ctx.arc(-r * 0.22, -r * 0.1, r * 0.14, 0, Math.PI * 2);
-    ctx.arc(r * 0.22, -r * 0.1, r * 0.14, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(-r * 0.25, -r * 0.14, r * 0.05, 0, Math.PI * 2);
-    ctx.arc(r * 0.19, -r * 0.14, r * 0.05, 0, Math.PI * 2);
+    ctx.arc(-r * 0.24, -r * 0.1, r * 0.17, 0, Math.PI * 2);
+    ctx.arc(r * 0.24, -r * 0.1, r * 0.17, 0, Math.PI * 2);
     ctx.fill();
 
-    // Yellow beak
-    ctx.fillStyle = '#fc9d19';
+    // White eye highlights & catchlights
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.moveTo(-r * 0.16, 0.05);
-    ctx.lineTo(r * 0.16, 0.05);
-    ctx.lineTo(0, r * 0.35);
+    ctx.arc(-r * 0.27, -r * 0.14, r * 0.065, 0, Math.PI * 2);
+    ctx.arc(r * 0.21, -r * 0.14, r * 0.065, 0, Math.PI * 2);
+    ctx.arc(-r * 0.2, -r * 0.06, r * 0.03, 0, Math.PI * 2);
+    ctx.arc(r * 0.28, -r * 0.06, r * 0.03, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Soft arched brown eyebrows
+    ctx.strokeStyle = '#78350f';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.arc(-r * 0.24, -r * 0.32, r * 0.15, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.arc(r * 0.24, -r * 0.32, r * 0.15, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.stroke();
+
+    // Bright golden curved duck-like beak with cheerful smile
+    const beakGrad = ctx.createLinearGradient(0, 0, 0, r * 0.4);
+    beakGrad.addColorStop(0, '#fde047');
+    beakGrad.addColorStop(0.5, '#f59e0b');
+    beakGrad.addColorStop(1, '#d97706');
+    ctx.fillStyle = beakGrad;
+
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.2, 0.05);
+    ctx.lineTo(r * 0.2, 0.05);
+    ctx.lineTo(0, r * 0.4);
     ctx.closePath();
     ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#b45309';
+    ctx.stroke();
   }
 
   // Draw Block (Wood, Ice, Stone, TNT)
