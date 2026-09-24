@@ -21,8 +21,10 @@ export class CharacterRenderer {
       CharacterRenderer.imgLoaded = true;
     };
     CharacterRenderer.sandeepImg.onerror = () => {
-      if (CharacterRenderer.sandeepImg) {
+      if (CharacterRenderer.sandeepImg && !CharacterRenderer.sandeepImg.src.includes('sandeep.svg')) {
         CharacterRenderer.sandeepImg.src = '/assets/sandeep.svg';
+      } else {
+        CharacterRenderer.imgLoaded = false;
       }
     };
   }

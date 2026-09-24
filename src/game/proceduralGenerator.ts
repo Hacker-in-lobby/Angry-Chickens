@@ -3,7 +3,7 @@ import { BlockConfig, ChickenType, LevelData, SandeepConfig } from '../types/gam
 export class LevelGenerator {
   // Ground reference in game coordinate space
   public static readonly GROUND_Y = 520;
-  public static readonly FORTRESS_START_X = 640;
+  public static readonly FORTRESS_START_X = 620;
 
   // Handcrafted starter levels
   public static getLevel(levelNumber: number): LevelData {
@@ -19,7 +19,7 @@ export class LevelGenerator {
 
     switch (num) {
       case 1:
-        // LEVEL 1: The Wooden Shack (Tutorial)
+        // LEVEL 1: The Wooden Shack (Tutorial) - Spacious for 2x Sandeep pig
         return {
           id: 1,
           name: "Sandeep's Wood Shack",
@@ -27,16 +27,17 @@ export class LevelGenerator {
           chickens: ['red', 'red', 'red'],
           blocks: [
             // Left pillar
-            { id: 'b1', x: fx + 80, y: gy - 50, width: 20, height: 100, material: 'wood' },
+            { id: 'b1', x: fx + 50, y: gy - 65, width: 24, height: 130, material: 'wood' },
             // Right pillar
-            { id: 'b2', x: fx + 180, y: gy - 50, width: 20, height: 100, material: 'wood' },
-            // Cross beam
-            { id: 'b3', x: fx + 130, y: gy - 110, width: 140, height: 20, material: 'wood' },
+            { id: 'b2', x: fx + 210, y: gy - 65, width: 24, height: 130, material: 'wood' },
+            // Cross beam sitting flush on pillars
+            { id: 'b3', x: fx + 130, y: gy - 140, width: 190, height: 20, material: 'wood' },
             // Top roof block
-            { id: 'b4', x: fx + 130, y: gy - 130, width: 60, height: 20, material: 'wood' },
+            { id: 'b4', x: fx + 130, y: gy - 165, width: 80, height: 26, material: 'wood' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 130, y: gy - 28, type: 'standard', radius: 26, health: 50, maxHealth: 50 },
+            // 2x size pig (radius 50 = diameter 100px)
+            { id: 'p1', x: fx + 130, y: gy - 50, type: 'standard', radius: 50, health: 70, maxHealth: 70 },
           ],
           starScores: [15000, 24000, 32000],
         };
@@ -50,17 +51,18 @@ export class LevelGenerator {
           chickens: ['blues', 'chuck', 'red'],
           blocks: [
             // Tower 1 (Ice)
-            { id: 'b1', x: fx + 60, y: gy - 60, width: 18, height: 120, material: 'ice' },
-            { id: 'b2', x: fx + 120, y: gy - 60, width: 18, height: 120, material: 'ice' },
-            { id: 'b3', x: fx + 90, y: gy - 130, width: 90, height: 18, material: 'ice' },
+            { id: 'b1', x: fx + 40, y: gy - 65, width: 22, height: 130, material: 'ice' },
+            { id: 'b2', x: fx + 180, y: gy - 65, width: 22, height: 130, material: 'ice' },
+            { id: 'b3', x: fx + 110, y: gy - 140, width: 165, height: 20, material: 'ice' },
             // Tower 2 (Wood)
-            { id: 'b4', x: fx + 180, y: gy - 60, width: 18, height: 120, material: 'wood' },
-            { id: 'b5', x: fx + 240, y: gy - 60, width: 18, height: 120, material: 'wood' },
-            { id: 'b6', x: fx + 210, y: gy - 130, width: 90, height: 18, material: 'wood' },
+            { id: 'b4', x: fx + 230, y: gy - 65, width: 22, height: 130, material: 'wood' },
+            { id: 'b5', x: fx + 370, y: gy - 65, width: 22, height: 130, material: 'wood' },
+            { id: 'b6', x: fx + 300, y: gy - 140, width: 165, height: 20, material: 'wood' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 90, y: gy - 26, type: 'standard', radius: 24, health: 50, maxHealth: 50 },
-            { id: 'p2', x: fx + 210, y: gy - 26, type: 'standard', radius: 24, health: 50, maxHealth: 50 },
+            // 2x size pigs
+            { id: 'p1', x: fx + 110, y: gy - 48, type: 'standard', radius: 48, health: 70, maxHealth: 70 },
+            { id: 'p2', x: fx + 300, y: gy - 48, type: 'standard', radius: 48, health: 70, maxHealth: 70 },
           ],
           starScores: [20000, 32000, 42000],
         };
@@ -74,17 +76,19 @@ export class LevelGenerator {
           chickens: ['bomb', 'chuck', 'red', 'red'],
           blocks: [
             // Heavy stone base
-            { id: 'b1', x: fx + 70, y: gy - 50, width: 30, height: 100, material: 'stone' },
-            { id: 'b2', x: fx + 190, y: gy - 50, width: 30, height: 100, material: 'stone' },
-            { id: 'b3', x: fx + 130, y: gy - 110, width: 160, height: 25, material: 'stone' },
+            { id: 'b1', x: fx + 50, y: gy - 65, width: 30, height: 130, material: 'stone' },
+            { id: 'b2', x: fx + 210, y: gy - 65, width: 30, height: 130, material: 'stone' },
+            { id: 'b3', x: fx + 130, y: gy - 140, width: 195, height: 24, material: 'stone' },
             // Upper wood deck
-            { id: 'b4', x: fx + 100, y: gy - 150, width: 20, height: 60, material: 'wood' },
-            { id: 'b5', x: fx + 160, y: gy - 150, width: 20, height: 60, material: 'wood' },
-            { id: 'b6', x: fx + 130, y: gy - 190, width: 90, height: 20, material: 'wood' },
+            { id: 'b4', x: fx + 80, y: gy - 195, width: 22, height: 90, material: 'wood' },
+            { id: 'b5', x: fx + 180, y: gy - 195, width: 22, height: 90, material: 'wood' },
+            { id: 'b6', x: fx + 130, y: gy - 250, width: 130, height: 20, material: 'wood' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 130, y: gy - 28, type: 'helmet', radius: 26, health: 80, maxHealth: 80 },
-            { id: 'p2', x: fx + 130, y: gy - 145, type: 'small', radius: 20, health: 40, maxHealth: 40 },
+            // 2x Helmet Pig (radius 52)
+            { id: 'p1', x: fx + 130, y: gy - 52, type: 'helmet', radius: 52, health: 120, maxHealth: 120 },
+            // 2x Small Pig (radius 38)
+            { id: 'p2', x: fx + 130, y: gy - 188, type: 'small', radius: 38, health: 50, maxHealth: 50 },
           ],
           starScores: [24000, 38000, 50000],
         };
@@ -97,21 +101,26 @@ export class LevelGenerator {
           subtitle: "Target the TNT crates to bring the house down!",
           chickens: ['chuck', 'bomb', 'red'],
           blocks: [
-            // TNT foundation
-            { id: 'b1', x: fx + 80, y: gy - 25, width: 45, height: 45, material: 'tnt' },
-            { id: 'b2', x: fx + 180, y: gy - 25, width: 45, height: 45, material: 'tnt' },
-            // Middle stone pillar
-            { id: 'b3', x: fx + 130, y: gy - 50, width: 25, height: 100, material: 'stone' },
-            // Long wooden bridge over TNT
-            { id: 'b4', x: fx + 130, y: gy - 95, width: 200, height: 20, material: 'wood' },
+            // Outer stone pillars
+            { id: 'b1', x: fx + 40, y: gy - 65, width: 26, height: 130, material: 'stone' },
+            { id: 'b2', x: fx + 220, y: gy - 65, width: 26, height: 130, material: 'stone' },
+            // TNT foundation resting on ground between pillars
+            { id: 'b3', x: fx + 130, y: gy - 24, width: 48, height: 48, material: 'tnt' },
+            // Middle stone pillar standing on TNT
+            { id: 'b4', x: fx + 130, y: gy - 88, width: 24, height: 80, material: 'stone' },
+            // Wooden roof deck
+            { id: 'b5', x: fx + 130, y: gy - 140, width: 215, height: 20, material: 'wood' },
             // Top wooden frame
-            { id: 'b5', x: fx + 90, y: gy - 140, width: 18, height: 70, material: 'wood' },
-            { id: 'b6', x: fx + 170, y: gy - 140, width: 18, height: 70, material: 'wood' },
-            { id: 'b7', x: fx + 130, y: gy - 185, width: 110, height: 18, material: 'wood' },
+            { id: 'b6', x: fx + 80, y: gy - 195, width: 20, height: 90, material: 'wood' },
+            { id: 'b7', x: fx + 180, y: gy - 195, width: 20, height: 90, material: 'wood' },
+            { id: 'b8', x: fx + 130, y: gy - 248, width: 130, height: 20, material: 'wood' },
+            // Side wooden shed
+            { id: 'b9', x: fx + 310, y: gy - 60, width: 24, height: 120, material: 'wood' },
+            { id: 'b10', x: fx + 265, y: gy - 130, width: 110, height: 20, material: 'wood' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 130, y: gy - 130, type: 'standard', radius: 26, health: 50, maxHealth: 50 },
-            { id: 'p2', x: fx + 220, y: gy - 26, type: 'standard', radius: 24, health: 50, maxHealth: 50 },
+            { id: 'p1', x: fx + 130, y: gy - 190, type: 'standard', radius: 48, health: 70, maxHealth: 70 },
+            { id: 'p2', x: fx + 265, y: gy - 48, type: 'standard', radius: 48, health: 70, maxHealth: 70 },
           ],
           starScores: [28000, 42000, 56000],
         };
@@ -125,22 +134,22 @@ export class LevelGenerator {
           chickens: ['red', 'chuck', 'bomb', 'blues'],
           blocks: [
             // Floor 1
-            { id: 'b1', x: fx + 80, y: gy - 40, width: 20, height: 80, material: 'wood' },
-            { id: 'b2', x: fx + 150, y: gy - 40, width: 20, height: 80, material: 'wood' },
-            { id: 'b3', x: fx + 115, y: gy - 90, width: 110, height: 18, material: 'stone' },
+            { id: 'b1', x: fx + 40, y: gy - 60, width: 24, height: 120, material: 'wood' },
+            { id: 'b2', x: fx + 200, y: gy - 60, width: 24, height: 120, material: 'wood' },
+            { id: 'b3', x: fx + 120, y: gy - 130, width: 195, height: 20, material: 'stone' },
             // Floor 2
-            { id: 'b4', x: fx + 80, y: gy - 135, width: 18, height: 70, material: 'ice' },
-            { id: 'b5', x: fx + 150, y: gy - 135, width: 18, height: 70, material: 'ice' },
-            { id: 'b6', x: fx + 115, y: gy - 180, width: 110, height: 18, material: 'wood' },
+            { id: 'b4', x: fx + 45, y: gy - 195, width: 22, height: 110, material: 'ice' },
+            { id: 'b5', x: fx + 195, y: gy - 195, width: 22, height: 110, material: 'ice' },
+            { id: 'b6', x: fx + 120, y: gy - 260, width: 185, height: 20, material: 'wood' },
             // Floor 3
-            { id: 'b7', x: fx + 80, y: gy - 220, width: 16, height: 60, material: 'wood' },
-            { id: 'b8', x: fx + 150, y: gy - 220, width: 16, height: 60, material: 'wood' },
-            { id: 'b9', x: fx + 115, y: gy - 260, width: 100, height: 18, material: 'wood' },
+            { id: 'b7', x: fx + 50, y: gy - 315, width: 20, height: 90, material: 'wood' },
+            { id: 'b8', x: fx + 190, y: gy - 315, width: 20, height: 90, material: 'wood' },
+            { id: 'b9', x: fx + 120, y: gy - 370, width: 170, height: 20, material: 'wood' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 115, y: gy - 28, type: 'standard', radius: 25, health: 50, maxHealth: 50 },
-            { id: 'p2', x: fx + 115, y: gy - 120, type: 'standard', radius: 22, health: 50, maxHealth: 50 },
-            { id: 'p3', x: fx + 115, y: gy - 285, type: 'helmet', radius: 24, health: 70, maxHealth: 70 },
+            { id: 'p1', x: fx + 120, y: gy - 48, type: 'standard', radius: 48, health: 70, maxHealth: 70 },
+            { id: 'p2', x: fx + 120, y: gy - 188, type: 'standard', radius: 46, health: 70, maxHealth: 70 },
+            { id: 'p3', x: fx + 120, y: gy - 318, type: 'helmet', radius: 48, health: 120, maxHealth: 120 },
           ],
           starScores: [32000, 48000, 62000],
         };
@@ -154,16 +163,16 @@ export class LevelGenerator {
           chickens: ['matilda', 'chuck', 'bomb', 'red'],
           blocks: [
             // Deep bunker trench
-            { id: 'b1', x: fx + 50, y: gy - 60, width: 30, height: 120, material: 'stone' },
-            { id: 'b2', x: fx + 130, y: gy - 20, width: 40, height: 40, material: 'tnt' },
-            { id: 'b3', x: fx + 210, y: gy - 60, width: 30, height: 120, material: 'stone' },
-            { id: 'b4', x: fx + 130, y: gy - 130, width: 180, height: 20, material: 'ice' },
-            { id: 'b5', x: fx + 130, y: gy - 160, width: 120, height: 20, material: 'wood' },
+            { id: 'b1', x: fx + 40, y: gy - 75, width: 30, height: 150, material: 'stone' },
+            { id: 'b2', x: fx + 140, y: gy - 25, width: 50, height: 50, material: 'tnt' },
+            { id: 'b3', x: fx + 240, y: gy - 75, width: 30, height: 150, material: 'stone' },
+            { id: 'b4', x: fx + 140, y: gy - 160, width: 240, height: 22, material: 'ice' },
+            { id: 'b5', x: fx + 140, y: gy - 190, width: 150, height: 22, material: 'wood' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 90, y: gy - 28, type: 'helmet', radius: 26, health: 80, maxHealth: 80 },
-            { id: 'p2', x: fx + 170, y: gy - 28, type: 'helmet', radius: 26, health: 80, maxHealth: 80 },
-            { id: 'p3', x: fx + 130, y: gy - 185, type: 'standard', radius: 22, health: 50, maxHealth: 50 },
+            { id: 'p1', x: fx + 90, y: gy - 50, type: 'helmet', radius: 50, health: 120, maxHealth: 120 },
+            { id: 'p2', x: fx + 190, y: gy - 50, type: 'helmet', radius: 50, health: 120, maxHealth: 120 },
+            { id: 'p3', x: fx + 140, y: gy - 220, type: 'standard', radius: 46, health: 70, maxHealth: 70 },
           ],
           starScores: [35000, 52000, 68000],
         };
@@ -177,18 +186,18 @@ export class LevelGenerator {
           chickens: ['chuck', 'blues', 'bomb', 'red'],
           blocks: [
             // Left fort
-            { id: 'b1', x: fx + 40, y: gy - 50, width: 20, height: 100, material: 'ice' },
-            { id: 'b2', x: fx + 110, y: gy - 50, width: 20, height: 100, material: 'ice' },
-            { id: 'b3', x: fx + 75, y: gy - 110, width: 100, height: 20, material: 'ice' },
+            { id: 'b1', x: fx + 30, y: gy - 65, width: 22, height: 130, material: 'ice' },
+            { id: 'b2', x: fx + 170, y: gy - 65, width: 22, height: 130, material: 'ice' },
+            { id: 'b3', x: fx + 100, y: gy - 140, width: 170, height: 20, material: 'ice' },
             // Right fort
-            { id: 'b4', x: fx + 200, y: gy - 50, width: 25, height: 100, material: 'stone' },
-            { id: 'b5', x: fx + 280, y: gy - 50, width: 25, height: 100, material: 'stone' },
-            { id: 'b6', x: fx + 240, y: gy - 110, width: 110, height: 22, material: 'stone' },
+            { id: 'b4', x: fx + 240, y: gy - 65, width: 26, height: 130, material: 'stone' },
+            { id: 'b5', x: fx + 380, y: gy - 65, width: 26, height: 130, material: 'stone' },
+            { id: 'b6', x: fx + 310, y: gy - 140, width: 170, height: 24, material: 'stone' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 75, y: gy - 26, type: 'standard', radius: 24, health: 50, maxHealth: 50 },
-            { id: 'p2', x: fx + 240, y: gy - 28, type: 'helmet', radius: 26, health: 80, maxHealth: 80 },
-            { id: 'p3', x: fx + 160, y: gy - 22, type: 'small', radius: 18, health: 35, maxHealth: 35 },
+            { id: 'p1', x: fx + 100, y: gy - 48, type: 'standard', radius: 48, health: 70, maxHealth: 70 },
+            { id: 'p2', x: fx + 310, y: gy - 52, type: 'helmet', radius: 52, health: 120, maxHealth: 120 },
+            { id: 'p3', x: fx + 205, y: gy - 38, type: 'small', radius: 38, health: 50, maxHealth: 50 },
           ],
           starScores: [38000, 56000, 72000],
         };
@@ -201,22 +210,22 @@ export class LevelGenerator {
           subtitle: "Dense stone requires concentrated heavy bombardment!",
           chickens: ['bomb', 'bomb', 'chuck', 'red'],
           blocks: [
-            // Bottom tier
-            { id: 'b1', x: fx + 40, y: gy - 35, width: 25, height: 70, material: 'stone' },
-            { id: 'b2', x: fx + 120, y: gy - 35, width: 25, height: 70, material: 'wood' },
-            { id: 'b3', x: fx + 200, y: gy - 35, width: 25, height: 70, material: 'stone' },
-            { id: 'b4', x: fx + 120, y: gy - 80, width: 195, height: 20, material: 'stone' },
+            // Bottom tier (3 wide chambers)
+            { id: 'b1', x: fx + 30, y: gy - 65, width: 28, height: 130, material: 'stone' },
+            { id: 'b2', x: fx + 180, y: gy - 65, width: 28, height: 130, material: 'wood' },
+            { id: 'b3', x: fx + 330, y: gy - 65, width: 28, height: 130, material: 'stone' },
+            { id: 'b4', x: fx + 180, y: gy - 140, width: 335, height: 24, material: 'stone' },
             // Middle tier
-            { id: 'b5', x: fx + 80, y: gy - 120, width: 20, height: 60, material: 'stone' },
-            { id: 'b6', x: fx + 160, y: gy - 120, width: 20, height: 60, material: 'stone' },
-            { id: 'b7', x: fx + 120, y: gy - 160, width: 120, height: 20, material: 'wood' },
+            { id: 'b5', x: fx + 105, y: gy - 200, width: 24, height: 95, material: 'stone' },
+            { id: 'b6', x: fx + 255, y: gy - 200, width: 24, height: 95, material: 'stone' },
+            { id: 'b7', x: fx + 180, y: gy - 258, width: 185, height: 22, material: 'wood' },
             // Top roof
-            { id: 'b8', x: fx + 120, y: gy - 195, width: 25, height: 50, material: 'wood' },
+            { id: 'b8', x: fx + 180, y: gy - 295, width: 45, height: 50, material: 'wood' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 80, y: gy - 26, type: 'standard', radius: 25, health: 50, maxHealth: 50 },
-            { id: 'p2', x: fx + 160, y: gy - 26, type: 'standard', radius: 25, health: 50, maxHealth: 50 },
-            { id: 'p3', x: fx + 120, y: gy - 110, type: 'helmet', radius: 26, health: 80, maxHealth: 80 },
+            { id: 'p1', x: fx + 105, y: gy - 50, type: 'standard', radius: 50, health: 70, maxHealth: 70 },
+            { id: 'p2', x: fx + 255, y: gy - 50, type: 'standard', radius: 50, health: 70, maxHealth: 70 },
+            { id: 'p3', x: fx + 180, y: gy - 200, type: 'helmet', radius: 50, health: 120, maxHealth: 120 },
           ],
           starScores: [42000, 60000, 78000],
         };
@@ -229,19 +238,23 @@ export class LevelGenerator {
           subtitle: "Dislodge heavy stone boulders to crush defenses below!",
           chickens: ['chuck', 'blues', 'bomb', 'red'],
           blocks: [
-            { id: 'b1', x: fx + 60, y: gy - 55, width: 22, height: 110, material: 'wood' },
-            { id: 'b2', x: fx + 150, y: gy - 55, width: 22, height: 110, material: 'ice' },
-            { id: 'b3', x: fx + 105, y: gy - 120, width: 140, height: 20, material: 'wood' },
-            // Rolling stone ball on top
-            { id: 'b4', x: fx + 80, y: gy - 155, width: 50, height: 50, material: 'stone', isCircle: true },
-            // Second level
-            { id: 'b5', x: fx + 210, y: gy - 35, width: 40, height: 40, material: 'tnt' },
-            { id: 'b6', x: fx + 210, y: gy - 80, width: 20, height: 50, material: 'wood' },
+            { id: 'b1', x: fx + 40, y: gy - 65, width: 24, height: 130, material: 'wood' },
+            { id: 'b2', x: fx + 200, y: gy - 65, width: 24, height: 130, material: 'ice' },
+            { id: 'b3', x: fx + 120, y: gy - 140, width: 195, height: 22, material: 'wood' },
+            // Stopper wedges for boulder
+            { id: 'b4a', x: fx + 75, y: gy - 165, width: 20, height: 25, material: 'wood' },
+            { id: 'b4b', x: fx + 165, y: gy - 165, width: 20, height: 25, material: 'wood' },
+            // Rolling stone ball on top safely nestled
+            { id: 'b4', x: fx + 120, y: gy - 180, width: 65, height: 65, material: 'stone', isCircle: true },
+            // Second building
+            { id: 'b5', x: fx + 280, y: gy - 25, width: 48, height: 48, material: 'tnt' },
+            { id: 'b6', x: fx + 280, y: gy - 85, width: 24, height: 70, material: 'wood' },
+            { id: 'b7', x: fx + 380, y: gy - 65, width: 24, height: 130, material: 'wood' },
+            { id: 'b8', x: fx + 330, y: gy - 140, width: 130, height: 20, material: 'wood' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 105, y: gy - 28, type: 'helmet', radius: 26, health: 80, maxHealth: 80 },
-            { id: 'p2', x: fx + 105, y: gy - 150, type: 'standard', radius: 24, health: 50, maxHealth: 50 },
-            { id: 'p3', x: fx + 210, y: gy - 120, type: 'standard', radius: 22, health: 50, maxHealth: 50 },
+            { id: 'p1', x: fx + 120, y: gy - 52, type: 'helmet', radius: 52, health: 120, maxHealth: 120 },
+            { id: 'p2', x: fx + 330, y: gy - 48, type: 'standard', radius: 48, health: 70, maxHealth: 70 },
           ],
           starScores: [45000, 65000, 85000],
         };
@@ -255,25 +268,27 @@ export class LevelGenerator {
           subtitle: "Dethrone King Sandeep and his elite royal guard!",
           chickens: ['bomb', 'chuck', 'matilda', 'red', 'blues'],
           blocks: [
-            // Stronghold perimeter
-            { id: 'b1', x: fx + 40, y: gy - 60, width: 28, height: 120, material: 'stone' },
-            { id: 'b2', x: fx + 120, y: gy - 25, width: 45, height: 45, material: 'tnt' },
-            { id: 'b3', x: fx + 200, y: gy - 60, width: 28, height: 120, material: 'stone' },
-            { id: 'b4', x: fx + 280, y: gy - 60, width: 28, height: 120, material: 'stone' },
-            // Floor 1 ceiling
-            { id: 'b5', x: fx + 120, y: gy - 130, width: 170, height: 22, material: 'stone' },
-            { id: 'b6', x: fx + 240, y: gy - 130, width: 100, height: 22, material: 'wood' },
-            // Royal Throne Room
-            { id: 'b7', x: fx + 80, y: gy - 180, width: 20, height: 80, material: 'wood' },
-            { id: 'b8', x: fx + 160, y: gy - 180, width: 20, height: 80, material: 'wood' },
-            { id: 'b9', x: fx + 120, y: gy - 230, width: 120, height: 20, material: 'stone' },
-            // Crown canopy
-            { id: 'b10', x: fx + 120, y: gy - 260, width: 45, height: 45, material: 'stone', isCircle: true },
+            // Stronghold perimeter (3 wide chambers)
+            { id: 'b1', x: fx + 30, y: gy - 75, width: 30, height: 150, material: 'stone' },
+            { id: 'b2', x: fx + 150, y: gy - 25, width: 50, height: 50, material: 'tnt' },
+            { id: 'b3', x: fx + 270, y: gy - 75, width: 30, height: 150, material: 'stone' },
+            { id: 'b4', x: fx + 390, y: gy - 75, width: 30, height: 150, material: 'stone' },
+            // Floor 1 solid ceiling
+            { id: 'b5', x: fx + 210, y: gy - 160, width: 400, height: 24, material: 'stone' },
+            // Royal Throne Room (Elevated center)
+            { id: 'b6', x: fx + 130, y: gy - 225, width: 24, height: 105, material: 'wood' },
+            { id: 'b7', x: fx + 290, y: gy - 225, width: 24, height: 105, material: 'wood' },
+            { id: 'b8', x: fx + 210, y: gy - 290, width: 200, height: 24, material: 'stone' },
+            // Crown canopy battlements
+            { id: 'b9', x: fx + 150, y: gy - 315, width: 26, height: 26, material: 'stone' },
+            { id: 'b10', x: fx + 270, y: gy - 315, width: 26, height: 26, material: 'stone' },
           ],
           pigs: [
-            { id: 'p1', x: fx + 80, y: gy - 28, type: 'helmet', radius: 26, health: 90, maxHealth: 90 },
-            { id: 'p2', x: fx + 240, y: gy - 28, type: 'helmet', radius: 26, health: 90, maxHealth: 90 },
-            { id: 'p3', x: fx + 120, y: gy - 165, type: 'king', radius: 34, health: 180, maxHealth: 180 },
+            // Guards (Helmet pigs, radius 52)
+            { id: 'p1', x: fx + 80, y: gy - 52, type: 'helmet', radius: 52, health: 130, maxHealth: 130 },
+            { id: 'p2', x: fx + 330, y: gy - 52, type: 'helmet', radius: 52, health: 130, maxHealth: 130 },
+            // KING SANDEEP (Majestic 2x size: radius 68 = 136px diameter!)
+            { id: 'p3', x: fx + 210, y: gy - 238, type: 'king', radius: 68, health: 260, maxHealth: 260 },
           ],
           starScores: [55000, 80000, 105000],
         };
@@ -281,6 +296,7 @@ export class LevelGenerator {
   }
 
   // Infinite Procedural Level Generator for Level 11, 12, ... 10,000+!
+  // Guaranteed rock-solid physics stability: no collapsing on spawn!
   public static generateProceduralLevel(levelNum: number): LevelData {
     const gy = this.GROUND_Y;
     const fx = this.FORTRESS_START_X;
@@ -295,86 +311,91 @@ export class LevelGenerator {
     const blocks: BlockConfig[] = [];
     const pigs: SandeepConfig[] = [];
 
-    // Scale complexity with level
-    const tierCount = Math.min(4, 2 + Math.floor((levelNum - 10) / 6));
-    const towers = 2 + (levelNum % 2); // 2 or 3 towers
+    // Scale tier count with level (2 to 3 tiers)
+    const tierCount = Math.min(3, 2 + Math.floor((levelNum - 10) / 10));
+    // Number of bays/rooms: 2 or 3
+    const bays = 2 + (levelNum % 2);
+    const pillarsCount = bays + 1; // 3 or 4 pillars
     const materials: ('wood' | 'ice' | 'stone')[] = ['wood', 'ice', 'stone'];
 
-    let currentY = gy;
+    // Tower spacing: 150-175px (generous room for 2x size pigs)
+    const baySpacing = 150 + Math.floor(rnd() * 25);
+    const colWidth = 28;
+    const beamHeight = 22;
+
+    let currentFloorY = gy;
     let blockIdCounter = 1;
     let pigIdCounter = 1;
 
-    // Tower spacing
-    const towerSpacing = 85 + Math.floor(rnd() * 30);
-    const towerPillars = towers + 1;
-
     for (let tier = 0; tier < tierCount; tier++) {
-      const colHeight = 70 + Math.floor(rnd() * 40);
-      const colWidth = 18 + Math.floor(rnd() * 10);
+      // Column height: 115-135px (ample headspace above 2x pigs)
+      const colHeight = 115 + Math.floor(rnd() * 20);
       const tierMat = materials[Math.floor(rnd() * materials.length)];
-
-      const colY = currentY - colHeight / 2;
+      const colY = currentFloorY - colHeight / 2;
 
       // Vertical columns
-      for (let c = 0; c < towerPillars; c++) {
-        const colX = fx + c * towerSpacing;
-
-        // Occasional TNT crate at ground level
-        if (tier === 0 && c === 1 && rnd() > 0.4) {
-          blocks.push({
-            id: `pb_${blockIdCounter++}`,
-            x: colX,
-            y: currentY - 22,
-            width: 44,
-            height: 44,
-            material: 'tnt',
-          });
-        } else {
-          blocks.push({
-            id: `pb_${blockIdCounter++}`,
-            x: colX,
-            y: colY,
-            width: colWidth,
-            height: colHeight,
-            material: tierMat,
-          });
-        }
-      }
-
-      // Horizontal cross beams / ceilings
-      const beamY = currentY - colHeight - 10;
-      const beamW = towerSpacing + 20;
-      const beamMat = materials[Math.floor(rnd() * materials.length)];
-
-      for (let b = 0; b < towerPillars - 1; b++) {
-        const beamX = fx + b * towerSpacing + towerSpacing / 2;
+      for (let c = 0; c < pillarsCount; c++) {
+        const colX = fx + c * baySpacing;
         blocks.push({
           id: `pb_${blockIdCounter++}`,
-          x: beamX,
-          y: beamY,
-          width: beamW,
-          height: 18,
-          material: beamMat,
+          x: colX,
+          y: colY,
+          width: colWidth,
+          height: colHeight,
+          material: tierMat,
         });
+      }
 
-        // Place a Sandeep pig inside this chamber!
-        if (rnd() > 0.3 || tier === 0) {
-          const pigType =
-            tier === tierCount - 1 && b === Math.floor((towerPillars - 1) / 2) && levelNum % 5 === 0
-              ? 'king'
-              : rnd() > 0.6
-              ? 'helmet'
-              : rnd() > 0.3
-              ? 'standard'
-              : 'small';
+      // Horizontal continuous slab resting FLUSH on top of columns
+      const totalSpan = (pillarsCount - 1) * baySpacing + colWidth + 30;
+      const slabX = fx + ((pillarsCount - 1) * baySpacing) / 2;
+      const slabY = currentFloorY - colHeight - beamHeight / 2;
+      const beamMat = materials[Math.floor(rnd() * materials.length)];
 
-          const radius = pigType === 'king' ? 32 : pigType === 'small' ? 20 : 25;
-          const hp = pigType === 'king' ? 160 : pigType === 'helmet' ? 85 : 50;
+      blocks.push({
+        id: `pb_${blockIdCounter++}`,
+        x: slabX,
+        y: slabY,
+        width: totalSpan,
+        height: beamHeight,
+        material: beamMat,
+      });
+
+      // Place pigs & occasional TNT safely inside the rooms of this tier
+      for (let b = 0; b < bays; b++) {
+        const roomCenterX = fx + b * baySpacing + baySpacing / 2;
+
+        // Occasional TNT crate on floor beside pig (tier 0 or 1)
+        if (tier === 0 && b === 0 && rnd() > 0.6) {
+          blocks.push({
+            id: `pb_${blockIdCounter++}`,
+            x: roomCenterX + 45,
+            y: currentFloorY - 24,
+            width: 46,
+            height: 46,
+            material: 'tnt',
+          });
+        }
+
+        // Determine if pig spawns in this chamber
+        if (rnd() > 0.25 || tier === 0 || pigs.length === 0) {
+          const isBoss = tier === tierCount - 1 && b === Math.floor(bays / 2) && levelNum % 5 === 0;
+          const pigType = isBoss
+            ? 'king'
+            : rnd() > 0.65
+            ? 'helmet'
+            : rnd() > 0.3
+            ? 'standard'
+            : 'small';
+
+          // 2x pig sizes!
+          const radius = pigType === 'king' ? 66 : pigType === 'helmet' ? 52 : pigType === 'small' ? 38 : 48;
+          const hp = pigType === 'king' ? 240 : pigType === 'helmet' ? 120 : pigType === 'small' ? 50 : 75;
 
           pigs.push({
             id: `pp_${pigIdCounter++}`,
-            x: beamX,
-            y: currentY - radius - 2,
+            x: roomCenterX,
+            y: currentFloorY - radius,
             type: pigType,
             radius,
             health: hp,
@@ -383,38 +404,78 @@ export class LevelGenerator {
         }
       }
 
-      currentY -= colHeight + 20;
+      // Floor for next tier sits directly on top of this beam
+      currentFloorY = slabY - beamHeight / 2;
     }
 
     // Ensure at least 2 pigs exist
-    if (pigs.length === 0) {
+    if (pigs.length < 2) {
       pigs.push({
         id: `pp_${pigIdCounter++}`,
-        x: fx + towerSpacing,
-        y: gy - 26,
+        x: fx + baySpacing,
+        y: gy - 48,
         type: 'standard',
-        radius: 25,
-        health: 50,
-        maxHealth: 50,
+        radius: 48,
+        health: 75,
+        maxHealth: 75,
       });
     }
 
-    // Top roof ornament or boulder
+    // Stable Roof Ornament / Battlements on top
+    const topSlabX = fx + ((pillarsCount - 1) * baySpacing) / 2;
+    const topSlabWidth = (pillarsCount - 1) * baySpacing + colWidth + 30;
+
+    // Left and right battlements
+    blocks.push({
+      id: `pb_${blockIdCounter++}`,
+      x: topSlabX - topSlabWidth / 2 + 18,
+      y: currentFloorY - 15,
+      width: 28,
+      height: 30,
+      material: 'stone',
+    });
+    blocks.push({
+      id: `pb_${blockIdCounter++}`,
+      x: topSlabX + topSlabWidth / 2 - 18,
+      y: currentFloorY - 15,
+      width: 28,
+      height: 30,
+      material: 'stone',
+    });
+
+    // Optional center boulder or decorative pediment
     if (rnd() > 0.5) {
       blocks.push({
         id: `pb_${blockIdCounter++}`,
-        x: fx + (towerPillars - 1) * (towerSpacing / 2),
-        y: currentY - 24,
-        width: 48,
-        height: 48,
+        x: topSlabX,
+        y: currentFloorY - 26,
+        width: 52,
+        height: 52,
         material: 'stone',
         isCircle: true,
+      });
+      // Side stoppers so the boulder doesn't roll until hit
+      blocks.push({
+        id: `pb_${blockIdCounter++}`,
+        x: topSlabX - 36,
+        y: currentFloorY - 14,
+        width: 18,
+        height: 24,
+        material: 'wood',
+      });
+      blocks.push({
+        id: `pb_${blockIdCounter++}`,
+        x: topSlabX + 36,
+        y: currentFloorY - 14,
+        width: 18,
+        height: 24,
+        material: 'wood',
       });
     }
 
     // Dynamic chicken roster tailored to the challenge
     const allChickenTypes: ChickenType[] = ['red', 'chuck', 'blues', 'bomb', 'matilda'];
-    const chickenCount = Math.min(6, 3 + Math.floor(pigs.length * 0.7));
+    const chickenCount = Math.min(6, Math.max(3, pigs.length + 1));
     const chickens: ChickenType[] = [];
 
     // Always start with a versatile bird
@@ -425,10 +486,10 @@ export class LevelGenerator {
     }
 
     // Compute star score targets
-    const baseScore = blocks.length * 750 + pigs.length * 5000;
+    const baseScore = blocks.length * 800 + pigs.length * 6000;
     const oneStar = Math.floor(baseScore * 0.6);
-    const twoStar = Math.floor(baseScore * 1.1 + (chickens.length - 1) * 7000);
-    const threeStar = Math.floor(baseScore * 1.5 + (chickens.length - 1) * 10000);
+    const twoStar = Math.floor(baseScore * 1.05 + (chickens.length - 1) * 7500);
+    const threeStar = Math.floor(baseScore * 1.45 + (chickens.length - 1) * 10500);
 
     const levelTitles = [
       'The Sandeep Fortress',

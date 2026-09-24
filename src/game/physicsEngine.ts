@@ -35,7 +35,7 @@ export class PhysicsGameEngine {
   // Slingshot
   public readonly SLING_X = 180;
   public readonly SLING_Y = 400;
-  public readonly MAX_PULL = 90;
+  public readonly MAX_PULL = 100;
   private isPulling: boolean = false;
   private pullPos = { x: 180, y: 400 };
   private canLaunch: boolean = true;
@@ -43,6 +43,8 @@ export class PhysicsGameEngine {
   private chickenAbilityUsed: boolean = false;
   private launchTime: number = 0;
   private settleTimer: number | null = null;
+  private isSettlingPhase: boolean = true;
+  private settlePhaseTimer: number | null = null;
 
   // Score
   private currentScore: number = 0;
@@ -81,11 +83,14 @@ export class PhysicsGameEngine {
 
   private initScenery() {
     this.clouds = [
-      { x: 100, y: 60, speed: 0.2, size: 60 },
-      { x: 380, y: 110, speed: 0.15, size: 85 },
-      { x: 720, y: 50, speed: 0.25, size: 70 },
-      { x: 1050, y: 90, speed: 0.18, size: 90 },
-      { x: 1350, y: 70, speed: 0.22, size: 65 },
+      { x: -300, y: 70, speed: 0.2, size: 70 },
+      { x: 100, y: 60, speed: 0.22, size: 60 },
+      { x: 480, y: 110, speed: 0.15, size: 85 },
+      { x: 880, y: 50, speed: 0.25, size: 70 },
+      { x: 1280, y: 90, speed: 0.18, size: 90 },
+      { x: 1680, y: 70, speed: 0.22, size: 65 },
+      { x: 2100, y: 85, speed: 0.19, size: 80 },
+      { x: 2550, y: 60, speed: 0.24, size: 75 },
     ];
   }
 
@@ -93,6 +98,15 @@ export class PhysicsGameEngine {
   public loadLevel(level: LevelData) {
     this.currentLevel = level;
     this.resetWorld();
+
+    // Settle phase prevents micro-settling physics from damaging pigs or collapsing structures at spawn
+    this.isSettlingPhase = true;
+    if (this.settlePhaseTimer) {
+      window.clearTimeout(this.settlePhaseTimer);
+    }
+    this.settlePhaseTimer = window.setTimeout(() => {
+      this.isSettlingPhase = false;
+    }, 1400);
 
     this.chickensQueue = [...level.chickens];
     this.totalChickensCount = level.chickens.length;
@@ -133,6 +147,10 @@ export class PhysicsGameEngine {
       window.clearTimeout(this.settleTimer);
       this.settleTimer = null;
     }
+    if (this.settlePhaseTimer) {
+      window.clearTimeout(this.settlePhaseTimer);
+      this.settlePhaseTimer = null;
+    }
     Matter.World.clear(this.world, false);
     this.pigBodies.clear();
     this.blockBodies.clear();
@@ -148,18 +166,18 @@ export class PhysicsGameEngine {
 
   private buildBoundaries() {
     const groundY = 520;
-    const ground = Matter.Bodies.rectangle(800, groundY + 100, 2400, 200, {
+    const ground = Matter.Bodies.rectangle(1200, groundY + 100, 4400, 200, {
       isStatic: true,
       friction: 0.9,
       label: 'ground',
     });
 
-    const leftWall = Matter.Bodies.rectangle(-200, 300, 100, 1000, {
+    const leftWall = Matter.Bodies.rectangle(-600, 300, 100, 1200, {
       isStatic: true,
       label: 'wall',
     });
 
-    const rightWall = Matter.Bodies.rectangle(1800, 300, 100, 1000, {
+    const rightWall = Matter.Bodies.rectangle(2600, 300, 100, 1200, {
       isStatic: true,
       label: 'wall',
     });
@@ -263,10 +281,22 @@ export class PhysicsGameEngine {
   }
 
   private checkPigDamage(target: Matter.Body, attacker: Matter.Body, relSpeed: number) {
+    // Settle phase protects pigs from passive physics settling at spawn
+    if (this.isSettlingPhase) return;
+
+    const isChicken = attacker.label.startsWith('chicken_') || attacker.label.startsWith('matilda_egg');
+
+    // For non-chicken bodies (falling blocks/nudges), require substantial impact speed
+    if (!isChicken && relSpeed < 3.8) return;
+
     for (const [id, pigData] of this.pigBodies.entries()) {
       if (pigData.body === target) {
         const massBonus = Math.min(3, attacker.mass);
-        const damage = Math.round(relSpeed * 8.5 * massBonus);
+        const damage = isChicken
+          ? Math.round(relSpeed * 10 * massBonus)
+          : Math.round((relSpeed - 2.0) * 8 * massBonus);
+
+        if (damage <= 0) return;
 
         pigData.config.health -= damage;
         soundManager.playSandeepHurt();
@@ -283,6 +313,11 @@ export class PhysicsGameEngine {
   }
 
   private checkBlockDamage(target: Matter.Body, attacker: Matter.Body, relSpeed: number) {
+    if (this.isSettlingPhase) return;
+
+    const isChicken = attacker.label.startsWith('chicken_') || attacker.label.startsWith('matilda_egg');
+    if (!isChicken && relSpeed < 2.5) return;
+
     for (const [id, blockData] of this.blockBodies.entries()) {
       if (blockData.body === target) {
         const mat = blockData.config.material;
@@ -306,7 +341,7 @@ export class PhysicsGameEngine {
         this.spawnImpactParticles(target.position.x, target.position.y, pColor, 3);
 
         // Check TNT trigger
-        if (mat === 'tnt' && (relSpeed > 2.8 || blockData.health <= 0)) {
+        if (mat === 'tnt' && (relSpeed > 3.2 || blockData.health <= 0)) {
           this.detonateTNT(target.position.x, target.position.y, id);
         } else if (blockData.health <= 0) {
           this.destroyBlock(id, blockData);
@@ -429,9 +464,17 @@ export class PhysicsGameEngine {
   public startPull(x: number, y: number): boolean {
     if (!this.canLaunch || this.chickenInFlight || !this.currentChickenType) return false;
 
-    // Check if clicked close to slingshot
+    // Instantly terminate settling phase upon user interaction
+    this.isSettlingPhase = false;
+    if (this.settlePhaseTimer) {
+      window.clearTimeout(this.settlePhaseTimer);
+      this.settlePhaseTimer = null;
+    }
+
+    // Check if clicked/touched close to slingshot with a generous touch area for mobile landscape
     const dist = Math.hypot(x - this.SLING_X, y - this.SLING_Y);
-    if (dist < 75) {
+    const inSlingZone = dist < 130 || (x >= 30 && x <= 330 && y >= 240 && y <= 560);
+    if (inSlingZone) {
       this.isPulling = true;
       this.updatePull(x, y);
       return true;
@@ -817,7 +860,7 @@ export class PhysicsGameEngine {
     // Update Clouds
     this.clouds.forEach((c) => {
       c.x += c.speed;
-      if (c.x > 1600) c.x = -150;
+      if (c.x > 3200) c.x = -600;
     });
 
     // Trail recording for active chicken
@@ -828,8 +871,8 @@ export class PhysicsGameEngine {
       }
 
       // Smooth camera follow
-      this.targetCameraX = Math.max(0, Math.min(pos.x - 380, 500));
-      this.targetCameraZoom = pos.x > 500 ? 0.9 : 1.0;
+      this.targetCameraX = Math.max(0, Math.min(pos.x - 380, 800));
+      this.targetCameraZoom = pos.x > 500 ? 0.88 : 1.0;
     } else {
       // Pan back to slingshot or middle
       if (!this.chickenInFlight) {
@@ -857,7 +900,7 @@ export class PhysicsGameEngine {
     ctx.translate(-this.cameraX, 0);
 
     // 1. SKY & CLOUDS
-    this.drawSkyAndScenery(w + 800, h);
+    this.drawSkyAndScenery(w, h);
 
     // 2. PREVIOUS FLIGHT TRAILS (Authentic Angry Birds dotted trail)
     this.drawFlightTrails();
@@ -898,6 +941,9 @@ export class PhysicsGameEngine {
   // Draw Scenery (Sky, Mountains, Rolling Hills, Textured Ground)
   private drawSkyAndScenery(w: number, h: number) {
     const ctx = this.ctx;
+    const left = -1000;
+    const right = 3400;
+    const span = right - left;
 
     // Sky Gradient
     const skyGrad = ctx.createLinearGradient(0, 0, 0, 520);
@@ -905,7 +951,7 @@ export class PhysicsGameEngine {
     skyGrad.addColorStop(0.6, '#a8e6cf');
     skyGrad.addColorStop(1, '#dcedc1');
     ctx.fillStyle = skyGrad;
-    ctx.fillRect(-200, 0, w, 520);
+    ctx.fillRect(left, 0, span, 520);
 
     // Fluffy cartoon clouds
     ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
@@ -920,38 +966,36 @@ export class PhysicsGameEngine {
     // Distant soft blue mountains
     ctx.fillStyle = '#81c784';
     ctx.beginPath();
-    ctx.moveTo(-200, 520);
-    ctx.lineTo(150, 360);
-    ctx.lineTo(480, 520);
-    ctx.lineTo(820, 330);
-    ctx.lineTo(1200, 520);
-    ctx.lineTo(1500, 370);
-    ctx.lineTo(1900, 520);
+    ctx.moveTo(left, 520);
+    for (let mx = left; mx <= right; mx += 340) {
+      ctx.lineTo(mx + 170, 340 + (Math.abs(mx) % 680 === 0 ? -30 : 20));
+      ctx.lineTo(mx + 340, 520);
+    }
     ctx.closePath();
     ctx.fill();
 
     // Rolling green hills
     ctx.fillStyle = '#66bb6a';
     ctx.beginPath();
-    ctx.moveTo(-200, 520);
-    ctx.bezierCurveTo(100, 430, 350, 440, 600, 520);
-    ctx.bezierCurveTo(800, 420, 1100, 440, 1400, 520);
-    ctx.bezierCurveTo(1600, 430, 1800, 450, 2000, 520);
+    ctx.moveTo(left, 520);
+    for (let hx = left; hx <= right; hx += 400) {
+      ctx.bezierCurveTo(hx + 100, 430, hx + 300, 440, hx + 400, 520);
+    }
     ctx.closePath();
     ctx.fill();
 
     // Lush Grassy Ground
-    const groundGrad = ctx.createLinearGradient(0, 520, 0, h);
+    const groundGrad = ctx.createLinearGradient(0, 520, 0, h + 200);
     groundGrad.addColorStop(0, '#558b2f');
     groundGrad.addColorStop(0.08, '#689f38');
     groundGrad.addColorStop(0.18, '#8d6e63');
     groundGrad.addColorStop(1, '#5d4037');
     ctx.fillStyle = groundGrad;
-    ctx.fillRect(-200, 520, w, h - 520);
+    ctx.fillRect(left, 520, span, h + 200 - 520);
 
     // Grassy border line on top
     ctx.fillStyle = '#7cb342';
-    ctx.fillRect(-200, 520, w, 8);
+    ctx.fillRect(left, 520, span, 8);
   }
 
   // Flight Trails (Dotted trajectory line left behind)
@@ -1074,12 +1118,12 @@ export class PhysicsGameEngine {
   // Draw Remaining Chickens waiting in line on the ground
   private drawChickenQueue() {
     const ctx = this.ctx;
-    const startX = this.SLING_X - 60;
+    const startX = this.SLING_X - 45;
     const groundY = 512;
 
     this.chickensQueue.forEach((type, idx) => {
-      const qx = startX - idx * 36;
-      const r = type === 'blues' ? 13 : type === 'bomb' ? 18 : 15;
+      const qx = startX - idx * 24;
+      const r = type === 'blues' ? 12 : type === 'bomb' ? 17 : 14;
       CharacterRenderer.drawChicken(ctx, type, qx, groundY - r, r, 0, false);
     });
   }

@@ -147,36 +147,47 @@ export default function App() {
 
       {/* 3. ACTIVE GAME PLAYING */}
       {view === 'playing' && (
-        <div className="relative w-full h-full">
-          <GameCanvas
-            level={currentLevel}
-            onScoreUpdate={setScore}
-            onPigsUpdate={(rem, tot) => {
-              setPigsRemaining(rem);
-              setTotalPigs(tot);
+        <div className="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden">
+          <div
+            className="relative flex items-center justify-center select-none touch-none shadow-2xl overflow-hidden"
+            style={{
+              aspectRatio: '16 / 9',
+              width: 'min(100vw, calc(100vh * 16 / 9))',
+              height: 'min(100vh, calc(100vw * 9 / 16))',
+              maxWidth: '100vw',
+              maxHeight: '100vh',
             }}
-            onChickensUpdate={(rem, tot) => {
-              setChickensRemaining(rem);
-              setTotalChickens(tot);
-            }}
-            onLevelComplete={handleLevelComplete}
-            onLevelFailed={handleLevelFailed}
-            isPaused={isPaused || showVictory || showGameOver}
-          />
+          >
+            <GameCanvas
+              level={currentLevel}
+              onScoreUpdate={setScore}
+              onPigsUpdate={(rem, tot) => {
+                setPigsRemaining(rem);
+                setTotalPigs(tot);
+              }}
+              onChickensUpdate={(rem, tot) => {
+                setChickensRemaining(rem);
+                setTotalChickens(tot);
+              }}
+              onLevelComplete={handleLevelComplete}
+              onLevelFailed={handleLevelFailed}
+              isPaused={isPaused || showVictory || showGameOver}
+            />
 
-          <GameHUD
-            level={currentLevel}
-            score={score}
-            highScore={progress.highScores[levelNumber] || 0}
-            pigsRemaining={pigsRemaining}
-            totalPigs={totalPigs}
-            chickensRemaining={chickensRemaining}
-            totalChickens={totalChickens}
-            soundEnabled={soundEnabled}
-            onPause={() => setIsPaused(true)}
-            onRestart={handleRestartLevel}
-            onToggleSound={handleToggleSound}
-          />
+            <GameHUD
+              level={currentLevel}
+              score={score}
+              highScore={progress.highScores[levelNumber] || 0}
+              pigsRemaining={pigsRemaining}
+              totalPigs={totalPigs}
+              chickensRemaining={chickensRemaining}
+              totalChickens={totalChickens}
+              soundEnabled={soundEnabled}
+              onPause={() => setIsPaused(true)}
+              onRestart={handleRestartLevel}
+              onToggleSound={handleToggleSound}
+            />
+          </div>
         </div>
       )}
 

@@ -27,8 +27,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   const engineRef = useRef<PhysicsGameEngine | null>(null);
   const animFrameRef = useRef<number | null>(null);
   const isDraggingSlingRef = useRef<boolean>(false);
+  const activePointerIdRef = useRef<number | null>(null);
 
-  // Logical game resolution
+  // Logical game resolution (16:9)
   const GAME_WIDTH = 1200;
   const GAME_HEIGHT = 675;
 
@@ -82,85 +83,96 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return { x: 0, y: 0 };
+
     const scaleX = GAME_WIDTH / rect.width;
     const scaleY = GAME_HEIGHT / rect.height;
+
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
+
     return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY,
+      x: Math.max(0, Math.min(GAME_WIDTH, x)),
+      y: Math.max(0, Math.min(GAME_HEIGHT, y)),
     };
   };
 
-  // Mouse handlers
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  // Unified Pointer handlers (supports both touch in landscape and mouse)
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isPaused) return;
+
+    // Prevent default gesture actions on mobile
+    e.preventDefault();
+
     const { x, y } = getCanvasCoords(e.clientX, e.clientY);
     const pulled = engineRef.current?.startPull(x, y);
+
     if (pulled) {
       isDraggingSlingRef.current = true;
+      activePointerIdRef.current = e.pointerId;
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {}
     } else {
-      // Tap in flight for special ability
+      // Tap in flight for special bird ability
       engineRef.current?.triggerAbility();
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isPaused || !isDraggingSlingRef.current) return;
+    e.preventDefault();
     const { x, y } = getCanvasCoords(e.clientX, e.clientY);
     engineRef.current?.updatePull(x, y);
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isPaused || !isDraggingSlingRef.current) return;
+    e.preventDefault();
     isDraggingSlingRef.current = false;
+
+    if (activePointerIdRef.current !== null) {
+      try {
+        e.currentTarget.releasePointerCapture(activePointerIdRef.current);
+      } catch {}
+      activePointerIdRef.current = null;
+    }
+
     engineRef.current?.releasePull();
   };
 
-  // Touch handlers for mobile devices
-  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (isPaused || e.touches.length === 0) return;
-    const touch = e.touches[0];
-    const { x, y } = getCanvasCoords(touch.clientX, touch.clientY);
-    const pulled = engineRef.current?.startPull(x, y);
-    if (pulled) {
-      isDraggingSlingRef.current = true;
-    } else {
-      // Tap in flight for ability
-      engineRef.current?.triggerAbility();
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (isPaused || !isDraggingSlingRef.current || e.touches.length === 0) return;
-    const touch = e.touches[0];
-    const { x, y } = getCanvasCoords(touch.clientX, touch.clientY);
-    engineRef.current?.updatePull(x, y);
-  };
-
-  const handleTouchEnd = () => {
-    if (isPaused || !isDraggingSlingRef.current) return;
+  const handlePointerCancel = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!isDraggingSlingRef.current) return;
     isDraggingSlingRef.current = false;
+
+    if (activePointerIdRef.current !== null) {
+      try {
+        e.currentTarget.releasePointerCapture(activePointerIdRef.current);
+      } catch {}
+      activePointerIdRef.current = null;
+    }
+
     engineRef.current?.releasePull();
   };
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden select-none touch-none">
-      <canvas
-        ref={canvasRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
-        className="w-full h-full object-contain cursor-crosshair touch-none"
-        style={{
-          aspectRatio: '16/9',
-          maxHeight: '100vh',
-          maxWidth: '100vw',
-        }}
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      onTouchStart={(e) => {
+        // Prevent mobile browser drag / bounce gestures
+        if (e.cancelable) e.preventDefault();
+      }}
+      onTouchMove={(e) => {
+        if (e.cancelable) e.preventDefault();
+      }}
+      className="w-full h-full block cursor-crosshair touch-none select-none"
+      style={{
+        touchAction: 'none',
+      }}
+    />
   );
 };
