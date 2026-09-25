@@ -1,6 +1,6 @@
-export type ChickenType = 'red' | 'chuck' | 'blues' | 'bomb' | 'matilda';
+export type ChickenType = 'red' | 'chuck' | 'blues' | 'bomb' | 'matilda' | 'silver';
 
-export type MaterialType = 'wood' | 'ice' | 'stone' | 'tnt';
+export type MaterialType = 'wood' | 'ice' | 'stone' | 'steel' | 'tnt';
 
 export type SandeepType = 'standard' | 'small' | 'helmet' | 'king';
 
@@ -23,12 +23,15 @@ export interface BlockConfig {
   material: MaterialType;
   angle?: number;
   isCircle?: boolean;
+  isStatic?: boolean; // Immovable floating island bedrock or fixed anchors
+  isIsland?: boolean; // Renders with floating rock island textures & grass
 }
 
 export interface LevelData {
   id: number;
   name: string;
   subtitle?: string;
+  theme?: 'ground' | 'sky';
   chickens: ChickenType[];
   blocks: BlockConfig[];
   pigs: SandeepConfig[];

@@ -581,6 +581,9 @@ export class CharacterRenderer {
       case 'matilda':
         this.drawMatildaChicken(ctx, radius);
         break;
+      case 'silver':
+        this.drawSilverChicken(ctx, radius, abilityActive);
+        break;
       default:
         this.drawRedChicken(ctx, radius);
         break;
@@ -1324,7 +1327,216 @@ export class CharacterRenderer {
     ctx.stroke();
   }
 
-  // Draw Block (Wood, Ice, Stone, TNT)
+  // SILVER (The Steel Drill Falcon) - High-Velocity Steel-Piercing Bird
+  private static drawSilverChicken(ctx: CanvasRenderingContext2D, r: number, drillActive: boolean) {
+    if (drillActive) {
+      // Spinning Rocket Drill Vortex Cone
+      ctx.save();
+      const vortexGrad = ctx.createRadialGradient(r * 0.8, 0, 2, r * 0.8, 0, r * 2.2);
+      vortexGrad.addColorStop(0, '#fef08a');
+      vortexGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.85)');
+      vortexGrad.addColorStop(0.65, 'rgba(2, 132, 199, 0.5)');
+      vortexGrad.addColorStop(1, 'rgba(30, 58, 138, 0)');
+      ctx.fillStyle = vortexGrad;
+      ctx.beginPath();
+      ctx.arc(r * 0.8, 0, r * 2.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sharp conical spiral drill waves
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3.5;
+      for (let s = 1; s <= 3; s++) {
+        ctx.beginPath();
+        ctx.ellipse(r * (0.6 + s * 0.4), 0, r * 0.35, r * (0.5 + s * 0.35), 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Supersonic speed trail lines behind
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-r * 1.4, -r * 0.5);
+      ctx.lineTo(-r * 2.4, -r * 0.5);
+      ctx.moveTo(-r * 1.5, 0);
+      ctx.lineTo(-r * 2.8, 0);
+      ctx.moveTo(-r * 1.4, r * 0.5);
+      ctx.lineTo(-r * 2.4, r * 0.5);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // 3 Sleek metallic tail feathers
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.85, -r * 0.1);
+    ctx.lineTo(-r * 1.6, -r * 0.36);
+    ctx.lineTo(-r * 1.4, -r * 0.05);
+    ctx.lineTo(-r * 1.7, 0.14);
+    ctx.lineTo(-r * 1.35, 0.22);
+    ctx.lineTo(-r * 1.55, 0.38);
+    ctx.lineTo(-r * 0.85, 0.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#0f172a';
+    ctx.stroke();
+
+    // Swept-back aerodynamic crest with metallic gold tips
+    const crestGrad = ctx.createLinearGradient(-r * 0.8, -r * 1.6, 0, -r * 0.8);
+    crestGrad.addColorStop(0, '#f59e0b'); // Golden tip
+    crestGrad.addColorStop(0.35, '#cbd5e1'); // Silver feather
+    crestGrad.addColorStop(1, '#475569'); // Dark root
+    ctx.fillStyle = crestGrad;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.2, -r * 0.9);
+    ctx.quadraticCurveTo(-r * 0.5, -r * 1.65, -r * 0.95, -r * 1.55);
+    ctx.quadraticCurveTo(-r * 0.4, -r * 1.25, -r * 0.1, -r * 1.05);
+    ctx.quadraticCurveTo(0, -r * 1.7, -r * 0.35, -r * 1.8);
+    ctx.quadraticCurveTo(r * 0.2, -r * 1.3, r * 0.15, -r * 0.92);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#334155';
+    ctx.stroke();
+
+    // Metallic silver spherical aerodynamic body with rich 3D shading
+    const bodyGrad = ctx.createRadialGradient(-r * 0.32, -r * 0.32, r * 0.08, 0, 0, r);
+    bodyGrad.addColorStop(0, '#f1f5f9');
+    bodyGrad.addColorStop(0.35, '#cbd5e1');
+    bodyGrad.addColorStop(0.7, '#64748b');
+    bodyGrad.addColorStop(1, '#334155');
+
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 3.2;
+    ctx.strokeStyle = '#1e293b';
+    ctx.stroke();
+
+    // Specular titanium highlight arc
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.lineWidth = r * 0.12;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(-r * 0.15, -r * 0.25, r * 0.58, -Math.PI * 0.75, -Math.PI * 0.28);
+    ctx.stroke();
+    ctx.restore();
+
+    // Platinum belly plumage
+    const bellyGrad = ctx.createLinearGradient(0, r * 0.1, 0, r * 0.95);
+    bellyGrad.addColorStop(0, '#ffffff');
+    bellyGrad.addColorStop(1, '#e2e8f0');
+    ctx.fillStyle = bellyGrad;
+    ctx.beginPath();
+    ctx.ellipse(r * 0.1, r * 0.44, r * 0.56, r * 0.42, 0.08, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#94a3b8';
+    ctx.stroke();
+
+    // Sleek metallic wing with turbine styling
+    ctx.save();
+    ctx.fillStyle = '#475569';
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.55, 0.05);
+    ctx.quadraticCurveTo(-r * 0.85, 0.18, -r * 0.88, 0.45);
+    ctx.quadraticCurveTo(-r * 0.68, 0.6, -r * 0.42, 0.54);
+    ctx.quadraticCurveTo(-r * 0.25, 0.46, -r * 0.35, 0.18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // Golden wing trim stripe
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.75, 0.25);
+    ctx.lineTo(-r * 0.48, 0.42);
+    ctx.stroke();
+    ctx.restore();
+
+    // Sharp warrior eyes (Amber/Yellow fire eyes)
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.25, -r * 0.05, r * 0.25, 0, Math.PI * 2);
+    ctx.arc(r * 0.25, -r * 0.05, r * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = '#0f172a';
+    ctx.stroke();
+
+    // Golden amber iris
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.arc(-r * 0.18, -r * 0.04, r * 0.16, 0, Math.PI * 2);
+    ctx.arc(r * 0.18, -r * 0.04, r * 0.16, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Black pupil
+    ctx.fillStyle = '#09090b';
+    ctx.beginPath();
+    ctx.arc(-r * 0.16, -r * 0.04, r * 0.09, 0, Math.PI * 2);
+    ctx.arc(r * 0.16, -r * 0.04, r * 0.09, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Catchlight highlights
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.2, -r * 0.09, r * 0.05, 0, Math.PI * 2);
+    ctx.arc(r * 0.12, -r * 0.09, r * 0.05, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Charcoal aerodynamic warrior eyebrows
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath();
+    ctx.moveTo(0, r * 0.02);
+    ctx.lineTo(-r * 0.75, -r * 0.28);
+    ctx.lineTo(-r * 0.72, -r * 0.48);
+    ctx.lineTo(-r * 0.06, -r * 0.15);
+    ctx.lineTo(r * 0.06, -r * 0.15);
+    ctx.lineTo(r * 0.72, -r * 0.48);
+    ctx.lineTo(r * 0.75, -r * 0.28);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = '#020617';
+    ctx.stroke();
+
+    // REINFORCED TITANIUM DRILL BEAK (Steel/Titanium conical drill with spiral grooves)
+    const drillGrad = ctx.createLinearGradient(0, -r * 0.05, r * 0.9, r * 0.2);
+    drillGrad.addColorStop(0, '#f8fafc');
+    drillGrad.addColorStop(0.35, '#94a3b8');
+    drillGrad.addColorStop(0.7, '#475569');
+    drillGrad.addColorStop(1, '#0f172a');
+    ctx.fillStyle = drillGrad;
+
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.22, -r * 0.02);
+    ctx.lineTo(r * 0.95, r * 0.1); // Long sharp drill tip
+    ctx.lineTo(-r * 0.1, r * 0.38);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#0f172a';
+    ctx.stroke();
+
+    // Spiral drill grooves on beak
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(0, 0.04);
+    ctx.lineTo(r * 0.25, 0.16);
+    ctx.moveTo(r * 0.25, 0.04);
+    ctx.lineTo(r * 0.55, 0.16);
+    ctx.moveTo(r * 0.55, 0.05);
+    ctx.lineTo(r * 0.8, 0.14);
+    ctx.stroke();
+  }
+
+  // Draw Block (Wood, Ice, Stone, Steel, TNT, Floating Islands)
   public static drawBlock(
     ctx: CanvasRenderingContext2D,
     material: string,
@@ -1334,11 +1546,66 @@ export class CharacterRenderer {
     h: number,
     angle: number = 0,
     healthRatio: number = 1,
-    isCircle: boolean = false
+    isCircle: boolean = false,
+    isIsland: boolean = false
   ) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);
+
+    const hw = w / 2;
+    const hh = h / 2;
+
+    // FLOATING ISLAND (Grassy bedrock sky platform)
+    if (isIsland) {
+      // 1. Craggy rock bedrock body
+      const rockGrad = ctx.createLinearGradient(0, -hh, 0, hh);
+      rockGrad.addColorStop(0, '#78716c');
+      rockGrad.addColorStop(0.5, '#57534e');
+      rockGrad.addColorStop(1, '#292524');
+      ctx.fillStyle = rockGrad;
+      ctx.beginPath();
+      ctx.roundRect(-hw, -hh, w, h, [8, 8, 22, 22]);
+      ctx.fill();
+
+      // Rock fissures & strata lines
+      ctx.strokeStyle = '#1c1917';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-hw + 15, 0);
+      ctx.lineTo(-hw + 45, hh * 0.5);
+      ctx.moveTo(hw - 30, -hh * 0.2);
+      ctx.lineTo(hw - 60, hh * 0.6);
+      ctx.stroke();
+
+      // 2. Lush green turf grass on top
+      const grassH = Math.min(18, h * 0.35);
+      const grassGrad = ctx.createLinearGradient(0, -hh, 0, -hh + grassH);
+      grassGrad.addColorStop(0, '#4ade80');
+      grassGrad.addColorStop(1, '#15803d');
+      ctx.fillStyle = grassGrad;
+      ctx.beginPath();
+      ctx.roundRect(-hw, -hh, w, grassH, [8, 8, 4, 4]);
+      ctx.fill();
+
+      // Grass tufts / blades overhanging the edge
+      ctx.fillStyle = '#16a34a';
+      for (let gx = -hw + 8; gx < hw - 8; gx += 16) {
+        ctx.beginPath();
+        ctx.moveTo(gx, -hh + grassH);
+        ctx.lineTo(gx + 8, -hh + grassH + 5);
+        ctx.lineTo(gx + 16, -hh + grassH);
+        ctx.fill();
+      }
+
+      // Rock outline
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#1c1917';
+      ctx.strokeRect(-hw, -hh, w, h);
+
+      ctx.restore();
+      return;
+    }
 
     if (isCircle) {
       const r = w / 2;
@@ -1363,9 +1630,6 @@ export class CharacterRenderer {
       ctx.restore();
       return;
     }
-
-    const hw = w / 2;
-    const hh = h / 2;
 
     switch (material) {
       case 'wood': {
@@ -1444,6 +1708,46 @@ export class CharacterRenderer {
 
         ctx.lineWidth = 2.5;
         ctx.strokeStyle = '#1f2937';
+        ctx.strokeRect(-hw, -hh, w, h);
+        break;
+      }
+      case 'steel': {
+        // Reinforced Heavy Steel Girder / Bar
+        const steelGrad = ctx.createLinearGradient(-hw, -hh, hw, hh);
+        steelGrad.addColorStop(0, '#64748b');
+        steelGrad.addColorStop(0.3, '#475569');
+        steelGrad.addColorStop(0.7, '#334155');
+        steelGrad.addColorStop(1, '#1e293b');
+
+        ctx.fillStyle = steelGrad;
+        ctx.fillRect(-hw, -hh, w, h);
+
+        // Metallic reflection highlight stripe
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+        if (w >= h) {
+          ctx.fillRect(-hw + 3, -hh + 2, w - 6, Math.max(2, h * 0.2));
+        } else {
+          ctx.fillRect(-hw + 2, -hh + 3, Math.max(2, w * 0.2), h - 6);
+        }
+
+        // Steel rivets / bolts along girder
+        ctx.fillStyle = '#94a3b8';
+        const rivetSpacing = Math.min(32, Math.max(14, (w >= h ? w : h) / 4));
+        const numRivets = Math.max(2, Math.floor((w >= h ? w : h) / rivetSpacing));
+
+        for (let r = 0; r < numRivets; r++) {
+          const t = (r + 0.5) / numRivets;
+          const rx = w >= h ? -hw + t * w : 0;
+          const ry = w >= h ? 0 : -hh + t * h;
+
+          ctx.beginPath();
+          ctx.arc(rx, ry, Math.min(3.5, Math.min(w, h) * 0.16), 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Dark industrial steel border
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#0f172a';
         ctx.strokeRect(-hw, -hh, w, h);
         break;
       }

@@ -164,35 +164,79 @@ export class PhysicsGameEngine {
     this.pullPos = { x: this.SLING_X, y: this.SLING_Y };
   }
 
+  private readonly VIRTUAL_BARRIER_X = 1750;
+
   private buildBoundaries() {
+    const isSky = this.currentLevel?.theme === 'sky';
     const groundY = 520;
-    const ground = Matter.Bodies.rectangle(1200, groundY + 100, 4400, 200, {
+
+    // Ground: In sky levels, the main ground is lower in the abyss so fallen items plunge into clouds
+    const ground = Matter.Bodies.rectangle(1200, isSky ? 850 : groundY + 100, 4400, 200, {
       isStatic: true,
       friction: 0.9,
       label: 'ground',
     });
 
-    const leftWall = Matter.Bodies.rectangle(-600, 300, 100, 1200, {
+    const leftWall = Matter.Bodies.rectangle(-200, 300, 100, 1400, {
       isStatic: true,
       label: 'wall',
     });
 
-    const rightWall = Matter.Bodies.rectangle(2600, 300, 100, 1200, {
+    // Virtual Boundary Wall at x = 1750 (Prevents pigs and blocks from sliding off-limits)
+    const rightBarrier = Matter.Bodies.rectangle(this.VIRTUAL_BARRIER_X, 260, 40, 1400, {
       isStatic: true,
-      label: 'wall',
+      restitution: 0.45,
+      friction: 0.4,
+      label: 'barrier',
     });
 
-    Matter.World.add(this.world, [ground, leftWall, rightWall]);
+    Matter.World.add(this.world, [ground, leftWall, rightBarrier]);
+
+    // In sky levels, ensure slingshot has a dedicated sturdy floating bedrock island underneath it
+    if (isSky) {
+      const slingIsland = Matter.Bodies.rectangle(this.SLING_X - 20, groundY + 28, 380, 56, {
+        isStatic: true,
+        friction: 0.95,
+        label: 'slingshot_island',
+      });
+      Matter.World.add(this.world, slingIsland);
+    }
   }
 
   private spawnBlock(config: BlockConfig) {
     let body: Matter.Body;
     const opts: Matter.IChamferableBodyDefinition = {
-      // Sturdy friction so pillars don't slide or collapse from micro-vibrations
-      friction: config.material === 'ice' ? 0.15 : config.material === 'wood' ? 0.85 : 0.98,
-      frictionStatic: config.material === 'ice' ? 0.3 : config.material === 'wood' ? 0.95 : 1.2,
-      restitution: config.material === 'ice' ? 0.12 : 0.01,
-      density: config.material === 'stone' ? 0.006 : config.material === 'wood' ? 0.003 : 0.0018,
+      isStatic: config.isStatic || false,
+      friction:
+        config.material === 'ice'
+          ? 0.15
+          : config.material === 'wood'
+          ? 0.85
+          : config.material === 'steel'
+          ? 0.8
+          : 0.98,
+      frictionStatic:
+        config.material === 'ice'
+          ? 0.3
+          : config.material === 'wood'
+          ? 0.95
+          : config.material === 'steel'
+          ? 1.0
+          : 1.2,
+      restitution:
+        config.material === 'ice'
+          ? 0.12
+          : config.material === 'steel'
+          ? 0.08
+          : 0.01,
+      density:
+        config.material === 'steel'
+          ? 0.012
+          : config.material === 'stone'
+          ? 0.006
+          : config.material === 'wood'
+          ? 0.003
+          : 0.0018,
       label: `block_${config.material}_${config.id}`,
     };
 
@@ -206,7 +250,18 @@ export class PhysicsGameEngine {
       Matter.Body.setAngle(body, config.angle);
     }
 
-    const maxHp = config.material === 'stone' ? 320 : config.material === 'wood' ? 160 : config.material === 'ice' ? 80 : 40;
+    const maxHp =
+      config.isIsland && config.isStatic
+        ? 999999
+        : config.material === 'steel'
+        ? 550
+        : config.material === 'stone'
+        ? 320
+        : config.material === 'wood'
+        ? 160
+        : config.material === 'ice'
+        ? 80
+        : 40;
 
     this.blockBodies.set(config.id, {
       body,
@@ -267,6 +322,13 @@ export class PhysicsGameEngine {
   }
 
   private handleCollisionPair(bodyA: Matter.Body, bodyB: Matter.Body) {
+    // Boundary barrier deflection sparks
+    if (bodyA.label === 'barrier' || bodyB.label === 'barrier') {
+      const p = bodyA.label === 'barrier' ? bodyB.position : bodyA.position;
+      this.spawnImpactParticles(this.VIRTUAL_BARRIER_X - 10, p.y, '#38bdf8', 6, 'spark');
+      return;
+    }
+
     const vA = bodyA.velocity;
     const vB = bodyB.velocity;
     const relSpeed = Math.hypot(vA.x - vB.x, vA.y - vB.y);
@@ -326,6 +388,9 @@ export class PhysicsGameEngine {
 
     for (const [id, blockData] of this.blockBodies.entries()) {
       if (blockData.body === target) {
+        // Floating bedrock islands are immovable and indestructible
+        if (blockData.config.isIsland && blockData.config.isStatic) return;
+
         const mat = blockData.config.material;
 
         // Multiplier based on attacker type
@@ -336,6 +401,12 @@ export class PhysicsGameEngine {
           attackerBonus = 3.2;
         } else if (attacker.label.startsWith('chicken_bomb') && mat === 'stone') {
           attackerBonus = 4.0;
+        } else if (attacker.label.startsWith('chicken_silver') && mat === 'steel') {
+          // Silver specializes in piercing through heavy steel!
+          attackerBonus = attacker.label.includes('drill') ? 14.0 : 6.5;
+        } else if (mat === 'steel' && !attacker.label.startsWith('chicken_silver')) {
+          // Steel is impervious to ordinary hits
+          attackerBonus = 0.25;
         }
 
         const damage = isChicken
@@ -347,8 +418,23 @@ export class PhysicsGameEngine {
 
         // Play impact sound & particles
         soundManager.playHit(mat, Math.min(2, relSpeed / 5));
-        const pColor = mat === 'wood' ? '#b07d48' : mat === 'ice' ? '#99e0ff' : mat === 'stone' ? '#8a949e' : '#dc2626';
-        this.spawnImpactParticles(target.position.x, target.position.y, pColor, 3);
+        const pColor =
+          mat === 'steel'
+            ? '#94a3b8'
+            : mat === 'wood'
+            ? '#b07d48'
+            : mat === 'ice'
+            ? '#99e0ff'
+            : mat === 'stone'
+            ? '#8a949e'
+            : '#dc2626';
+        this.spawnImpactParticles(
+          target.position.x,
+          target.position.y,
+          pColor,
+          4,
+          mat === 'steel' ? 'spark' : 'square'
+        );
 
         // Check TNT trigger
         if (mat === 'tnt' && (relSpeed > 3.2 || blockData.health <= 0)) {
@@ -363,7 +449,14 @@ export class PhysicsGameEngine {
 
   private destroyBlock(id: string, blockData: { body: Matter.Body; config: BlockConfig }) {
     const pos = blockData.body.position;
-    const pts = blockData.config.material === 'stone' ? 200 : blockData.config.material === 'wood' ? 120 : 80;
+    const pts =
+      blockData.config.material === 'steel'
+        ? 350
+        : blockData.config.material === 'stone'
+        ? 200
+        : blockData.config.material === 'wood'
+        ? 120
+        : 80;
 
     this.addScore(pts, pos.x, pos.y, pts > 150 ? '#fde047' : '#ffffff');
     this.spawnImpactParticles(pos.x, pos.y, '#d1d5db', 8);
@@ -557,11 +650,15 @@ export class PhysicsGameEngine {
         ? 48
         : this.currentChickenType === 'chuck'
         ? 44
+        : this.currentChickenType === 'silver'
+        ? 46
         : 46;
 
     const density =
       this.currentChickenType === 'bomb'
         ? 0.0055
+        : this.currentChickenType === 'silver'
+        ? 0.0072
         : this.currentChickenType === 'matilda'
         ? 0.0035
         : this.currentChickenType === 'red'
@@ -672,6 +769,21 @@ export class PhysicsGameEngine {
         this.extraChickenBodies.push(egg);
 
         this.spawnImpactParticles(pos.x, pos.y, '#ffffff', 10, 'smoke');
+        break;
+      }
+      case 'silver': {
+        // High-velocity Supersonic Steel Drill Burst
+        soundManager.playBirdVoice();
+        const curAngle = Math.atan2(vel.y, vel.x);
+        const drillSpeed = Math.max(Math.hypot(vel.x, vel.y) * 2.3, 34);
+        Matter.Body.setVelocity(this.activeChickenBody, {
+          x: Math.cos(curAngle) * drillSpeed,
+          y: Math.sin(curAngle) * drillSpeed,
+        });
+        // Tag active chicken as drilling so checkBlockDamage deals massive piercing damage through steel
+        this.activeChickenBody.label = `chicken_silver_drill_${Date.now()}`;
+        this.spawnImpactParticles(pos.x, pos.y, '#38bdf8', 16, 'spark');
+        this.spawnImpactParticles(pos.x, pos.y, '#fef08a', 10, 'spark');
         break;
       }
       case 'red':
@@ -870,6 +982,32 @@ export class PhysicsGameEngine {
   public update(dt: number) {
     Matter.Engine.update(this.engine, 1000 / 60);
 
+    // Sky theme abyss check: pigs and blocks that fall off floating islands plunge into the clouds!
+    if (this.currentLevel?.theme === 'sky') {
+      const pigsToPop: [string, any][] = [];
+      this.pigBodies.forEach((pigData, id) => {
+        if (pigData.body.position.y > 610) {
+          pigsToPop.push([id, pigData]);
+        }
+      });
+      pigsToPop.forEach(([id, pigData]) => {
+        this.addScore(5000, pigData.body.position.x, 560, '#38bdf8');
+        this.spawnImpactParticles(pigData.body.position.x, 560, '#ffffff', 16, 'smoke');
+        this.popSandeep(id, pigData);
+      });
+
+      const blocksToRemove: [string, Matter.Body][] = [];
+      this.blockBodies.forEach((blockData, id) => {
+        if (!blockData.config.isStatic && blockData.body.position.y > 680) {
+          blocksToRemove.push([id, blockData.body]);
+        }
+      });
+      blocksToRemove.forEach(([id, body]) => {
+        Matter.World.remove(this.world, body);
+        this.blockBodies.delete(id);
+      });
+    }
+
     // Update Particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
@@ -980,19 +1118,22 @@ export class PhysicsGameEngine {
     // 7. CHICKENS QUEUE WAITING ON THE GROUND
     this.drawChickenQueue();
 
-    // 8. DESTRUCTIBLE BLOCKS
+    // 8. DESTRUCTIBLE BLOCKS & FLOATING ISLANDS
     this.drawBlocks();
 
-    // 9. SANDEEP PIGS
+    // 9. VIRTUAL SCREEN BARRIER (Prevents pigs from escaping past combat limits)
+    this.drawVirtualBarrier();
+
+    // 10. SANDEEP PIGS
     this.drawPigs();
 
-    // 10. ACTIVE FLYING CHICKEN & EXTRAS
+    // 11. ACTIVE FLYING CHICKEN & EXTRAS
     this.drawActiveChickens();
 
-    // 11. PARTICLES & EXPLOSIONS
+    // 12. PARTICLES & EXPLOSIONS
     this.drawParticles();
 
-    // 12. FLOATING SCORE POPUPS
+    // 13. FLOATING SCORE POPUPS
     this.drawFloatingTexts();
 
     ctx.restore();
@@ -1004,8 +1145,124 @@ export class PhysicsGameEngine {
     const left = -1000;
     const right = 3400;
     const span = right - left;
+    const isSky = this.currentLevel?.theme === 'sky';
 
-    // Sky Gradient
+    if (isSky) {
+      // Atmospheric High-Altitude Sky
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, 520);
+      skyGrad.addColorStop(0, '#0284c7');
+      skyGrad.addColorStop(0.35, '#38bdf8');
+      skyGrad.addColorStop(0.7, '#7dd3fc');
+      skyGrad.addColorStop(1, '#e0f2fe');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(left, 0, span, 520);
+
+      // Distant celestial sun rays / aura
+      ctx.save();
+      const sunGrad = ctx.createRadialGradient(250, 60, 20, 250, 60, 320);
+      sunGrad.addColorStop(0, 'rgba(254, 240, 138, 0.45)');
+      sunGrad.addColorStop(0.5, 'rgba(253, 224, 71, 0.15)');
+      sunGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = sunGrad;
+      ctx.beginPath();
+      ctx.arc(250, 60, 320, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Distant floating background islands with tiny waterfalls
+      const islands = [
+        { x: -150, y: 160, w: 120, h: 45 },
+        { x: 420, y: 110, w: 140, h: 50 },
+        { x: 920, y: 170, w: 160, h: 55 },
+        { x: 1480, y: 130, w: 130, h: 48 },
+        { x: 2150, y: 180, w: 150, h: 52 },
+      ];
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(71, 85, 105, 0.35)';
+      islands.forEach((isl) => {
+        ctx.beginPath();
+        ctx.moveTo(isl.x, isl.y);
+        ctx.lineTo(isl.x + isl.w, isl.y);
+        ctx.lineTo(isl.x + isl.w * 0.5, isl.y + isl.h);
+        ctx.closePath();
+        ctx.fill();
+        // Whispy waterfall cascading down into clouds
+        ctx.strokeStyle = 'rgba(224, 242, 254, 0.4)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(isl.x + isl.w * 0.45, isl.y + isl.h * 0.6);
+        ctx.lineTo(isl.x + isl.w * 0.45, isl.y + isl.h * 0.6 + 65);
+        ctx.stroke();
+      });
+      ctx.restore();
+
+      // Fluffy cartoon clouds drifting
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      this.clouds.forEach((c) => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.size * 0.45, 0, Math.PI * 2);
+        ctx.arc(c.x + c.size * 0.35, c.y - c.size * 0.15, c.size * 0.55, 0, Math.PI * 2);
+        ctx.arc(c.x + c.size * 0.75, c.y, c.size * 0.42, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Bottom Ocean / Sea of Soft Cumulus Clouds (instead of ground)
+      const cloudSeaGrad = ctx.createLinearGradient(0, 500, 0, h + 200);
+      cloudSeaGrad.addColorStop(0, '#f8fafc');
+      cloudSeaGrad.addColorStop(0.3, '#e2e8f0');
+      cloudSeaGrad.addColorStop(0.7, '#cbd5e1');
+      cloudSeaGrad.addColorStop(1, '#94a3b8');
+      ctx.fillStyle = cloudSeaGrad;
+      ctx.fillRect(left, 500, span, h + 200 - 500);
+
+      // Puffy billowy cloud waves across the bottom horizon
+      ctx.fillStyle = '#ffffff';
+      for (let cx = left; cx <= right; cx += 90) {
+        ctx.beginPath();
+        ctx.arc(cx, 510, 48, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Slingshot Floating Launch Island (Sturdy bedrock platform with grass)
+      ctx.save();
+      const sx = this.SLING_X - 20;
+      const sy = 520;
+      const iw = 360;
+      const ih = 70;
+
+      // Bedrock crag
+      const rockGrad = ctx.createLinearGradient(0, sy, 0, sy + ih);
+      rockGrad.addColorStop(0, '#57534e');
+      rockGrad.addColorStop(0.5, '#44403c');
+      rockGrad.addColorStop(1, '#1c1917');
+      ctx.fillStyle = rockGrad;
+      ctx.beginPath();
+      ctx.moveTo(sx - iw / 2, sy);
+      ctx.lineTo(sx + iw / 2, sy);
+      ctx.lineTo(sx + iw / 2 - 25, sy + ih * 0.6);
+      ctx.lineTo(sx, sy + ih);
+      ctx.lineTo(sx - iw / 2 + 25, sy + ih * 0.6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#1c1917';
+      ctx.stroke();
+
+      // Lush grass top on launch island
+      const grassGrad = ctx.createLinearGradient(0, sy - 6, 0, sy + 14);
+      grassGrad.addColorStop(0, '#4ade80');
+      grassGrad.addColorStop(1, '#15803d');
+      ctx.fillStyle = grassGrad;
+      ctx.beginPath();
+      ctx.roundRect(sx - iw / 2 - 4, sy - 4, iw + 8, 16, 6);
+      ctx.fill();
+      ctx.restore();
+
+      return;
+    }
+
+    // Default Ground Scenery (Rolling green hills, distant mountains, textured ground)
     const skyGrad = ctx.createLinearGradient(0, 0, 0, 520);
     skyGrad.addColorStop(0, '#56ccf2');
     skyGrad.addColorStop(0.6, '#a8e6cf');
@@ -1056,6 +1313,77 @@ export class PhysicsGameEngine {
     // Grassy border line on top
     ctx.fillStyle = '#7cb342';
     ctx.fillRect(left, 520, span, 8);
+  }
+
+  // Draw Virtual Energy Barrier Wall at x = 1750
+  private drawVirtualBarrier() {
+    const ctx = this.ctx;
+    const bx = this.VIRTUAL_BARRIER_X;
+    const topY = -220;
+    const botY = 560;
+
+    ctx.save();
+    // Ambient cyan force field glow strip
+    const barrierGrad = ctx.createLinearGradient(bx - 32, 0, bx + 32, 0);
+    barrierGrad.addColorStop(0, 'rgba(14, 165, 233, 0)');
+    barrierGrad.addColorStop(0.35, 'rgba(56, 189, 248, 0.22)');
+    barrierGrad.addColorStop(0.5, 'rgba(125, 211, 252, 0.6)');
+    barrierGrad.addColorStop(0.65, 'rgba(56, 189, 248, 0.22)');
+    barrierGrad.addColorStop(1, 'rgba(14, 165, 233, 0)');
+
+    ctx.fillStyle = barrierGrad;
+    ctx.fillRect(bx - 32, topY, 64, botY - topY);
+
+    // Neon laser beam core
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 3.5;
+    ctx.shadowColor = '#0284c7';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(bx, topY);
+    ctx.lineTo(bx, botY);
+    ctx.stroke();
+
+    // Energy pulse wave markings
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.lineWidth = 1.8;
+    const pulseOffset = (Date.now() / 60) % 36;
+    for (let y = topY + pulseOffset; y < botY; y += 36) {
+      ctx.beginPath();
+      ctx.moveTo(bx - 10, y);
+      ctx.lineTo(bx + 10, y);
+      ctx.stroke();
+    }
+
+    // Top and Bottom emitter beacons
+    [topY + 140, botY].forEach((py) => {
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(bx, py, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Inner power crystal
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(bx, py, 5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Holographic label rotated along barrier
+    ctx.save();
+    ctx.translate(bx - 7, 240);
+    ctx.rotate(-Math.PI / 2);
+    ctx.font = '900 10px sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+    ctx.letterSpacing = '2px';
+    ctx.fillText('⚡ BARRIER ⚡', 0, 0);
+    ctx.restore();
+
+    ctx.restore();
   }
 
   // Flight Trails (Dotted trajectory line left behind)
@@ -1111,6 +1439,8 @@ export class PhysicsGameEngine {
         ? 48
         : this.currentChickenType === 'chuck'
         ? 44
+        : this.currentChickenType === 'silver'
+        ? 46
         : 46;
 
     const angle = this.isPulling ? Math.atan2(this.SLING_Y - this.pullPos.y, this.SLING_X - this.pullPos.x) : 0;
@@ -1192,7 +1522,18 @@ export class PhysicsGameEngine {
 
     this.chickensQueue.forEach((type, idx) => {
       const qx = startX - idx * 58;
-      const r = type === 'blues' ? 26 : type === 'bomb' ? 40 : type === 'matilda' ? 36 : type === 'chuck' ? 32 : 34;
+      const r =
+        type === 'blues'
+          ? 26
+          : type === 'bomb'
+          ? 40
+          : type === 'matilda'
+          ? 36
+          : type === 'chuck'
+          ? 32
+          : type === 'silver'
+          ? 34
+          : 34;
       CharacterRenderer.drawChicken(ctx, type, qx, groundY - r, r, 0, false);
     });
   }
@@ -1214,7 +1555,8 @@ export class PhysicsGameEngine {
         block.config.height,
         angle,
         healthRatio,
-        block.config.isCircle
+        block.config.isCircle,
+        block.config.isIsland
       );
     });
   }
@@ -1294,6 +1636,8 @@ export class PhysicsGameEngine {
           ? 34
           : this.currentChickenType === 'chuck'
           ? 30
+          : this.currentChickenType === 'silver'
+          ? 32
           : 32;
 
       CharacterRenderer.drawChicken(ctx, this.currentChickenType, pos.x, pos.y, r, angle, this.chickenAbilityUsed);

@@ -135,7 +135,7 @@ export default function App() {
   const totalStarsCount = Object.values(progress.stars).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-slate-950 font-sans select-none touch-none">
+    <div className={`relative w-screen h-screen overflow-hidden bg-slate-950 font-sans select-none ${view === 'playing' ? 'touch-none' : 'touch-auto'}`}>
       {/* 1. START SCREEN */}
       {view === 'start' && (
         <StartScreen

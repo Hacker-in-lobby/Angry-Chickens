@@ -275,7 +275,82 @@ class SoundManager {
         gain.connect(this.ctx.destination);
         osc.start(now);
         osc.stop(now + 0.11);
+      } else if (material === 'steel') {
+        // Sharp metallic clang and anvil ring
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(880 + Math.random() * 200, now);
+        osc1.frequency.exponentialRampToValueAtTime(320, now + 0.22);
+
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(1760, now);
+        osc2.frequency.exponentialRampToValueAtTime(440, now + 0.12);
+
+        gain.gain.setValueAtTime(volume * 1.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.23);
+        osc2.stop(now + 0.23);
       }
+    } catch {}
+  }
+
+  // Silver's high-speed rocket drill sound
+  public playDrillSound() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      // High-frequency spinning drill whir
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(280, now);
+      osc.frequency.linearRampToValueAtTime(950, now + 0.18);
+      osc.frequency.linearRampToValueAtTime(1400, now + 0.35);
+
+      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.42);
+    } catch {}
+  }
+
+  // Falling down abyss whistle (when tumbling off floating sky island)
+  public playAbyssFall() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.7);
+
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.72);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.75);
     } catch {}
   }
 

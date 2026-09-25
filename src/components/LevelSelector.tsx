@@ -40,7 +40,7 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({
         {/* Endless Random Level Button */}
         <button
           onClick={() => {
-            const randomLvl = 11 + Math.floor(Math.random() * 40);
+            const randomLvl = 16 + Math.floor(Math.random() * 50);
             onSelectLevel(randomLvl);
           }}
           className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-bold rounded-full border-2 border-emerald-900 shadow hover:bg-emerald-700 transition-all font-['Luckiest_Guy',cursive] text-sm"

@@ -77,14 +77,34 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
                   <div className="text-stone-700">Heavy explosive! Tap or wait for impact to blow stone & TNT!</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 bg-amber-50 p-2 rounded-xl border border-amber-200 col-span-1 sm:col-span-2">
+              <div className="flex items-start gap-2 bg-amber-50 p-2 rounded-xl border border-amber-200">
                 <span className="text-2xl">🥚</span>
                 <div>
                   <div className="font-black text-pink-700">MATILDA (White)</div>
                   <div className="text-stone-700">Tap in flight to drop a high-explosive egg bomb straight down!</div>
                 </div>
               </div>
+              <div className="flex items-start gap-2 bg-slate-100 p-2 rounded-xl border border-slate-300">
+                <span className="text-2xl">🦅</span>
+                <div>
+                  <div className="font-black text-slate-800">SILVER (Steel Piercer)</div>
+                  <div className="text-stone-700">Tap in flight to trigger Supersonic Titanium Drill that pierces heavy steel bars!</div>
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* Sky & Barrier section */}
+          <div className="bg-white/80 p-4 rounded-2xl border-2 border-amber-900/20 shadow-xs">
+            <h3 className="text-xl font-black text-sky-900 mb-2 flex items-center gap-2 font-['Luckiest_Guy',cursive]">
+              <Sparkles className="w-5 h-5 text-sky-600" /> FLOATING SKY ISLANDS & VIRTUAL BARRIER
+            </h3>
+            <p className="text-xs sm:text-sm font-semibold mb-1.5">
+              • <strong>Floating Sky Islands:</strong> Sky levels feature floating bedrock platforms! Knock pigs off the edge to plunge them into the clouds for huge score bonuses!
+            </p>
+            <p className="text-xs sm:text-sm font-semibold">
+              • <strong>Virtual Barrier:</strong> A glowing boundary wall at the screen edge prevents pigs from sliding away, deflecting them back into battle!
+            </p>
           </div>
 
           {/* Sandeep Target section */}

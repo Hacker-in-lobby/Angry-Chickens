@@ -7,7 +7,7 @@ export class LevelGenerator {
 
   // Handcrafted starter levels
   public static getLevel(levelNumber: number): LevelData {
-    if (levelNumber <= 10) {
+    if (levelNumber <= 15) {
       return this.getHandcraftedLevel(levelNumber);
     }
     return this.generateProceduralLevel(levelNumber);
@@ -260,7 +260,6 @@ export class LevelGenerator {
         };
 
       case 10:
-      default:
         // LEVEL 10: King Sandeep's Throne
         return {
           id: 10,
@@ -292,15 +291,187 @@ export class LevelGenerator {
           ],
           starScores: [55000, 80000, 105000],
         };
+
+      case 11:
+        // LEVEL 11: Sky Island: Silver Dawn (Theme: sky, Introduces Silver & Steel)
+        return {
+          id: 11,
+          name: "Sky Island: Silver Dawn",
+          subtitle: "Tap Silver in flight to drill straight through heavy steel girders!",
+          theme: 'sky',
+          chickens: ['silver', 'chuck', 'red'],
+          blocks: [
+            // Floating Bedrock Sky Island (Immovable & indestructible platform)
+            { id: 'isl1', x: fx + 160, y: gy - 70, width: 340, height: 48, material: 'stone', isStatic: true, isIsland: true },
+            // Sturdy stone side columns
+            { id: 'b1', x: fx + 50, y: gy - 145, width: 32, height: 100, material: 'stone' },
+            { id: 'b2', x: fx + 270, y: gy - 145, width: 32, height: 100, material: 'stone' },
+            // Heavy Reinforced Steel Girder (Crossbar protecting pig)
+            { id: 'b3', x: fx + 160, y: gy - 200, width: 250, height: 26, material: 'steel' },
+            // Upper wooden observation deck
+            { id: 'b4', x: fx + 110, y: gy - 250, width: 20, height: 75, material: 'wood' },
+            { id: 'b5', x: fx + 210, y: gy - 250, width: 20, height: 75, material: 'wood' },
+            { id: 'b6', x: fx + 160, y: gy - 295, width: 140, height: 20, material: 'wood' },
+          ],
+          pigs: [
+            // Lower bunker pig (behind steel girder)
+            { id: 'p1', x: fx + 160, y: gy - 130, type: 'helmet', radius: 52, health: 120, maxHealth: 120 },
+            // Upper deck scout
+            { id: 'p2', x: fx + 160, y: gy - 245, type: 'small', radius: 40, health: 50, maxHealth: 50 },
+          ],
+          starScores: [25000, 38000, 52000],
+        };
+
+      case 12:
+        // LEVEL 12: The Steel Sky Cage (Theme: sky)
+        return {
+          id: 12,
+          name: "The Steel Sky Cage",
+          subtitle: "Sandeep is locked in a steel cage! Pierce through to topple it into the clouds!",
+          theme: 'sky',
+          chickens: ['silver', 'silver', 'bomb', 'blues'],
+          blocks: [
+            // Island 1: Low explosive outpost
+            { id: 'isl1', x: fx + 70, y: gy - 60, width: 220, height: 46, material: 'stone', isStatic: true, isIsland: true },
+            { id: 'b1', x: fx + 30, y: gy - 125, width: 22, height: 90, material: 'ice' },
+            { id: 'b2', x: fx + 110, y: gy - 125, width: 22, height: 90, material: 'ice' },
+            { id: 'b3', x: fx + 70, y: gy - 175, width: 120, height: 20, material: 'wood' },
+            { id: 'b4', x: fx + 70, y: gy - 100, width: 44, height: 44, material: 'tnt' },
+
+            // Island 2: High Steel Cage
+            { id: 'isl2', x: fx + 340, y: gy - 140, width: 250, height: 46, material: 'stone', isStatic: true, isIsland: true },
+            // 3 vertical steel bars
+            { id: 'b5', x: fx + 260, y: gy - 215, width: 22, height: 110, material: 'steel' },
+            { id: 'b6', x: fx + 340, y: gy - 215, width: 22, height: 110, material: 'steel' },
+            { id: 'b7', x: fx + 420, y: gy - 215, width: 22, height: 110, material: 'steel' },
+            // Heavy steel ceiling plate
+            { id: 'b8', x: fx + 340, y: gy - 275, width: 190, height: 24, material: 'steel' },
+          ],
+          pigs: [
+            { id: 'p1', x: fx + 70, y: gy - 210, type: 'standard', radius: 46, health: 70, maxHealth: 70 },
+            { id: 'p2', x: fx + 300, y: gy - 185, type: 'helmet', radius: 50, health: 120, maxHealth: 120 },
+            { id: 'p3', x: fx + 380, y: gy - 185, type: 'helmet', radius: 50, health: 120, maxHealth: 120 },
+          ],
+          starScores: [32000, 50000, 68000],
+        };
+
+      case 13:
+        // LEVEL 13: Floating Archipelago (Theme: sky, 3 ascending islands)
+        return {
+          id: 13,
+          name: "Floating Archipelago",
+          subtitle: "Three soaring sky islands! Knock pigs off the edge into the abyss!",
+          theme: 'sky',
+          chickens: ['silver', 'matilda', 'chuck', 'bomb'],
+          blocks: [
+            // Island 1 (Lower)
+            { id: 'isl1', x: fx + 40, y: gy - 50, width: 170, height: 42, material: 'stone', isStatic: true, isIsland: true },
+            { id: 'b1', x: fx + 40, y: gy - 95, width: 44, height: 44, material: 'tnt' },
+            { id: 'b2', x: fx + 40, y: gy - 140, width: 130, height: 20, material: 'wood' },
+
+            // Island 2 (Mid tier)
+            { id: 'isl2', x: fx + 220, y: gy - 150, width: 180, height: 42, material: 'stone', isStatic: true, isIsland: true },
+            { id: 'b3', x: fx + 170, y: gy - 210, width: 24, height: 80, material: 'stone' },
+            { id: 'b4', x: fx + 270, y: gy - 210, width: 24, height: 80, material: 'stone' },
+            { id: 'b5', x: fx + 220, y: gy - 255, width: 150, height: 22, material: 'stone' },
+
+            // Island 3 (High in the clouds)
+            { id: 'isl3', x: fx + 410, y: gy - 250, width: 190, height: 42, material: 'stone', isStatic: true, isIsland: true },
+            { id: 'b6', x: fx + 360, y: gy - 315, width: 20, height: 90, material: 'steel' },
+            { id: 'b7', x: fx + 460, y: gy - 315, width: 20, height: 90, material: 'steel' },
+            { id: 'b8', x: fx + 410, y: gy - 365, width: 140, height: 24, material: 'steel' },
+          ],
+          pigs: [
+            { id: 'p1', x: fx + 40, y: gy - 175, type: 'small', radius: 38, health: 50, maxHealth: 50 },
+            { id: 'p2', x: fx + 220, y: gy - 195, type: 'helmet', radius: 48, health: 120, maxHealth: 120 },
+            { id: 'p3', x: fx + 410, y: gy - 295, type: 'helmet', radius: 52, health: 130, maxHealth: 130 },
+          ],
+          starScores: [42000, 62000, 84000],
+        };
+
+      case 14:
+        // LEVEL 14: Steel Sky Dreadnought (Theme: sky, armored warship)
+        return {
+          id: 14,
+          name: "Steel Sky Dreadnought",
+          subtitle: "Heavily armored sky battleship! Pierce the steel armor into the engine core!",
+          theme: 'sky',
+          chickens: ['silver', 'silver', 'bomb', 'chuck', 'red'],
+          blocks: [
+            // Massive battleship bedrock hull
+            { id: 'isl1', x: fx + 220, y: gy - 80, width: 440, height: 50, material: 'stone', isStatic: true, isIsland: true },
+            // Lower engine room steel armor
+            { id: 'b1', x: fx + 80, y: gy - 145, width: 26, height: 90, material: 'steel' },
+            { id: 'b2', x: fx + 180, y: gy - 145, width: 24, height: 90, material: 'steel' },
+            { id: 'b3', x: fx + 260, y: gy - 145, width: 24, height: 90, material: 'steel' },
+            { id: 'b4', x: fx + 360, y: gy - 145, width: 26, height: 90, material: 'steel' },
+            // Main steel flight deck
+            { id: 'b5', x: fx + 130, y: gy - 195, width: 170, height: 24, material: 'steel' },
+            { id: 'b6', x: fx + 310, y: gy - 195, width: 170, height: 24, material: 'steel' },
+            // Engine core TNT inside hull
+            { id: 'b7', x: fx + 220, y: gy - 125, width: 48, height: 48, material: 'tnt' },
+            // Upper bridge tower
+            { id: 'b8', x: fx + 170, y: gy - 250, width: 22, height: 85, material: 'stone' },
+            { id: 'b9', x: fx + 270, y: gy - 250, width: 22, height: 85, material: 'stone' },
+            { id: 'b10', x: fx + 220, y: gy - 298, width: 140, height: 22, material: 'steel' },
+          ],
+          pigs: [
+            { id: 'p1', x: fx + 130, y: gy - 135, type: 'helmet', radius: 48, health: 120, maxHealth: 120 },
+            { id: 'p2', x: fx + 310, y: gy - 135, type: 'helmet', radius: 48, health: 120, maxHealth: 120 },
+            { id: 'p3', x: fx + 220, y: gy - 240, type: 'king', radius: 60, health: 220, maxHealth: 220 },
+          ],
+          starScores: [50000, 75000, 102000],
+        };
+
+      case 15:
+      default:
+        // LEVEL 15: Emperor Sandeep's Cloud Palace (Theme: sky, the ultimate boss castle)
+        return {
+          id: 15,
+          name: "Emperor Sandeep's Cloud Palace",
+          subtitle: "Dethrone Emperor Sandeep and shatter his celestial steel palace!",
+          theme: 'sky',
+          chickens: ['silver', 'bomb', 'matilda', 'chuck', 'silver'],
+          blocks: [
+            // Lower Courtyard Floating Island
+            { id: 'isl1', x: fx + 100, y: gy - 70, width: 300, height: 48, material: 'stone', isStatic: true, isIsland: true },
+            { id: 'b1', x: fx + 20, y: gy - 135, width: 28, height: 95, material: 'stone' },
+            { id: 'b2', x: fx + 100, y: gy - 110, width: 44, height: 44, material: 'tnt' },
+            { id: 'b3', x: fx + 180, y: gy - 135, width: 28, height: 95, material: 'stone' },
+            { id: 'b4', x: fx + 100, y: gy - 190, width: 200, height: 24, material: 'steel' },
+
+            // High Throne Floating Island
+            { id: 'isl2', x: fx + 370, y: gy - 170, width: 270, height: 48, material: 'stone', isStatic: true, isIsland: true },
+            // Massive steel columns supporting the royal canopy
+            { id: 'b5', x: fx + 290, y: gy - 245, width: 26, height: 110, material: 'steel' },
+            { id: 'b6', x: fx + 450, y: gy - 245, width: 26, height: 110, material: 'steel' },
+            { id: 'b7', x: fx + 370, y: gy - 308, width: 210, height: 26, material: 'steel' },
+            // Upper crystal spire
+            { id: 'b8', x: fx + 330, y: gy - 365, width: 20, height: 90, material: 'ice' },
+            { id: 'b9', x: fx + 410, y: gy - 365, width: 20, height: 90, material: 'ice' },
+            { id: 'b10', x: fx + 370, y: gy - 418, width: 120, height: 20, material: 'stone' },
+          ],
+          pigs: [
+            // Royal Courtyard Guard
+            { id: 'p1', x: fx + 50, y: gy - 120, type: 'helmet', radius: 50, health: 130, maxHealth: 130 },
+            { id: 'p2', x: fx + 150, y: gy - 120, type: 'helmet', radius: 50, health: 130, maxHealth: 130 },
+            // High Throne Guard
+            { id: 'p3', x: fx + 420, y: gy - 220, type: 'helmet', radius: 52, health: 140, maxHealth: 140 },
+            // EMPEROR SANDEEP (Giant Boss pig, radius: 72 = 144px diameter!)
+            { id: 'p4', x: fx + 350, y: gy - 235, type: 'king', radius: 72, health: 320, maxHealth: 320 },
+          ],
+          starScores: [65000, 95000, 135000],
+        };
     }
   }
 
-  // Infinite Procedural Level Generator for Level 11, 12, ... 10,000+!
+  // Infinite Procedural Level Generator for Level 16, 17, ... 10,000+!
   // Engineered with architectural stability: sturdy footers, independent bay lintels,
-  // and modular multi-tower designs so a single attack never causes a domino collapse.
+  // floating sky islands, and modular multi-tower designs so a single attack never causes a domino collapse.
   public static generateProceduralLevel(levelNum: number): LevelData {
     const gy = this.GROUND_Y;
     const fx = this.FORTRESS_START_X;
+    const isSky = levelNum % 2 === 1;
 
     // Pseudo-random deterministic seed based on levelNum
     let seed = levelNum * 9301 + 49297;
@@ -313,6 +484,34 @@ export class LevelGenerator {
     const pigs: SandeepConfig[] = [];
     let blockIdCounter = 1;
     let pigIdCounter = 1;
+
+    // If sky level, place floating bedrock sky islands beneath the fortresses
+    if (isSky) {
+      blocks.push({
+        id: `sky_isl_main`,
+        x: fx + 200,
+        y: gy - 22,
+        width: 480,
+        height: 50,
+        material: 'stone',
+        isStatic: true,
+        isIsland: true,
+      });
+
+      if (rnd() > 0.4) {
+        // High floating island outpost
+        blocks.push({
+          id: `sky_isl_high`,
+          x: fx + 360,
+          y: gy - 180,
+          width: 200,
+          height: 44,
+          material: 'stone',
+          isStatic: true,
+          isIsland: true,
+        });
+      }
+    }
 
     // 4 Distinct Architectural Archetypes
     const archetype = levelNum % 4;
@@ -704,13 +903,19 @@ export class LevelGenerator {
       });
     }
 
-    // Dynamic chicken roster tailored to the challenge
-    const allChickenTypes: ChickenType[] = ['red', 'chuck', 'blues', 'bomb', 'matilda'];
+    // Dynamic chicken roster tailored to the challenge (includes Silver!)
+    const allChickenTypes: ChickenType[] = ['red', 'chuck', 'blues', 'bomb', 'matilda', 'silver'];
     const chickenCount = Math.min(6, Math.max(3, pigs.length + 1));
     const chickens: ChickenType[] = [];
 
-    // Always start with a versatile bird
-    chickens.push('red');
+    // Always start with Red or Silver if steel is present
+    const hasSteel = blocks.some((b) => b.material === 'steel');
+    if (hasSteel || (isSky && rnd() > 0.5)) {
+      chickens.push('silver');
+    } else {
+      chickens.push('red');
+    }
+
     for (let i = 1; i < chickenCount; i++) {
       const pick = allChickenTypes[Math.floor(rnd() * allChickenTypes.length)];
       chickens.push(pick);
@@ -722,22 +927,34 @@ export class LevelGenerator {
     const twoStar = Math.floor(baseScore * 0.95 + (chickens.length - 1) * 4500);
     const threeStar = Math.floor(baseScore * 1.35 + (chickens.length - 1) * 7000);
 
-    const levelTitles = [
-      'The Sandeep Fortress',
-      'Bastion of Sandeep',
-      'Emerald Outpost',
-      'Sandeep Timberland',
-      'Granite Citadel',
-      'The High Bunker',
-      'Sandeep Stronghold',
-      'Fortress of Clucks',
-    ];
+    const levelTitles = isSky
+      ? [
+          'Floating Cloud Citadel',
+          'Celestial Sky Bastion',
+          'Sky Island Stronghold',
+          'Azure Heights Fortress',
+          'Cloudtop Outpost',
+          'Skyrealm Bastion',
+        ]
+      : [
+          'The Sandeep Fortress',
+          'Bastion of Sandeep',
+          'Emerald Outpost',
+          'Sandeep Timberland',
+          'Granite Citadel',
+          'The High Bunker',
+          'Sandeep Stronghold',
+          'Fortress of Clucks',
+        ];
     const name = `${levelTitles[levelNum % levelTitles.length]} #${levelNum}`;
 
     return {
       id: levelNum,
       name,
-      subtitle: `Autogenerated Physics Arena - ${pigs.length} Sandeeps Defending`,
+      subtitle: isSky
+        ? `Floating Sky Islands - ${pigs.length} Sandeeps Defending`
+        : `Autogenerated Fortress - ${pigs.length} Sandeeps Defending`,
+      theme: isSky ? 'sky' : 'ground',
       chickens,
       blocks,
       pigs,
